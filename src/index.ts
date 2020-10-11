@@ -1,14 +1,9 @@
-import http, { IncomingMessage, ServerResponse } from 'http'
+import express, { Request, Response } from 'express'
 
-const handler = (request: IncomingMessage, response: ServerResponse) => {
-  http
-    .request('http://jsonplaceholder.typicode.com/posts/1', function (externalResponse) {
-      externalResponse.pipe(response)
-    })
-    .on('error', function (e) {
-      response.statusCode = 500
-    })
-    .end()
-}
+const app = express()
 
-http.createServer(handler).listen(8080, () => console.log('started'))
+app.get('/', (request: Request, response: Response) => {
+  response.send(`Welcome to Express!`)
+})
+
+app.listen(3000)

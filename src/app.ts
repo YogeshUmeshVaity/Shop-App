@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import { HttpException } from './exceptions/HttpException'
+import path from 'path'
 
 const app = express()
 
@@ -12,7 +13,7 @@ app.use('/admin', adminRoutes)
 app.use('/', shopRoutes)
 
 app.use((request: Request, response: Response) => {
-  response.status(404).send(`<h1>Page not found!</h1>`)
+  response.status(404).sendFile(path.join(__dirname, 'views', '404.html'))
 })
 
 app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {

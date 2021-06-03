@@ -4,7 +4,7 @@ import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import { HttpException } from './exceptions/HttpException'
 import path from 'path'
-import { rootDir } from './util/path'
+import { rootDirectory } from './util/path'
 
 const app = express()
 
@@ -14,7 +14,7 @@ app.use('/admin', adminRoutes)
 app.use('/', shopRoutes)
 
 app.use((request: Request, response: Response) => {
-    response.status(404).sendFile(path.join(rootDir(), 'views', '404.html'))
+    response.status(404).sendFile(path.join(rootDirectory(), 'views', '404.html'))
 })
 
 app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {

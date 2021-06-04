@@ -1,5 +1,4 @@
 import express, { NextFunction, Request, Response } from 'express'
-import bodyParser from 'body-parser'
 import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import { HttpException } from './exceptions/HttpException'
@@ -8,7 +7,10 @@ import { rootDirectory } from './util/path'
 
 const app = express()
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }))
+
+// Used for serving public static files.
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/admin', adminRoutes)
 app.use('/', shopRoutes)

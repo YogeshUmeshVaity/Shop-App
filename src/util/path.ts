@@ -7,7 +7,6 @@ export function rootDirectory(): string {
     if (!mainModule) {
         throw new Error('Root directory is undefined.')
     } else {
-        console.log(path.dirname(mainModule.filename))
         return path.dirname(mainModule.filename)
     }
 }

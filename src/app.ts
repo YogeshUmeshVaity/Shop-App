@@ -7,6 +7,12 @@ import { rootDirectory } from './util/path'
 
 const app = express()
 
+// Set the rendering engine to be used.
+app.set('view engine', 'pug')
+
+// Set the name of the directory where views are stored.
+app.set('views', path.join(__dirname, 'views'))
+
 app.use(express.urlencoded({ extended: false }))
 
 // Used for serving public static files.
@@ -21,7 +27,6 @@ app.use((request: Request, response: Response) => {
 
 app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {
     err.status = 404
-    err.message = 'Not Found'
     next(err)
 })
 

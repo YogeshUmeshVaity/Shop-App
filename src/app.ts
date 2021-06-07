@@ -22,7 +22,7 @@ app.use('/admin', adminRoutes)
 app.use('/', shopRoutes)
 
 app.use((request: Request, response: Response) => {
-    response.status(404).sendFile(path.join(rootDirectory(), 'views', '404.html'))
+    response.status(404).render('404', { pageTitle: 'Page Not Found' })
 })
 
 app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {

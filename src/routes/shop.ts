@@ -7,5 +7,5 @@ export const shopRoutes = express.Router()
 // __dirname points to the location of this file. So, we go one directory up by specifying double dot.
 shopRoutes.get('/', (request: Request, response: Response) => {
     console.log(products)
-    response.render('shop')
+    response.render('shop', { productList: products, pageTitle: 'Shop' })
 })

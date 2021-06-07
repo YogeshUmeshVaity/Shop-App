@@ -3,7 +3,6 @@ import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import { HttpException } from './exceptions/HttpException'
 import path from 'path'
-import { rootDirectory } from './util/path'
 
 const app = express()
 

@@ -1,6 +1,4 @@
 import express, { Request, Response } from 'express'
-import path from 'path'
-import { rootDirectory } from '../util/path'
 import { Product } from '../models/product'
 
 export const adminRoutes = express.Router()

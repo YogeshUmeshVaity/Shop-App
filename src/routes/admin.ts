@@ -7,7 +7,7 @@ export const adminRoutes = express.Router()
 export const products: Array<Product> = []
 
 adminRoutes.get('/add-product', (request: Request, response: Response) => {
-    response.sendFile(path.join(rootDirectory(), 'views', 'add-product.html'))
+    response.render('add-product', { pageTitle: 'Add Product'})
 })
 
 adminRoutes.post('/product', (request: Request, response: Response) => {

@@ -2,10 +2,10 @@ doctype html
 html(lang="en")
     head
         meta(charset="UTF-8")
-        meta(http-equiv="X-UA-Compatible", content="IE=edge")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible" content="IE=edge")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
         title #{pageTitle}
-        link(rel="stylesheet", href="/css/main.css")
+        link(rel="stylesheet" href="/css/main.css")
         block styles
     body 
         header.main-header
@@ -14,6 +14,6 @@ html(lang="en")
                     li.main-header__item 
                         a(href="/") Shop
                     li.main-header__item 
-                        a(href="/admin/add-product") Add Product
+                        a(href="/admin/add-product", class=(routePath === '/admin/add-product' ? 'active' : '')) Add Product
 
     block content

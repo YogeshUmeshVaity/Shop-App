@@ -3,11 +3,15 @@ import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import { HttpException } from './exceptions/HttpException'
 import path from 'path'
+import expressHandlebars from 'express-handlebars'
 
 const app = express()
 
+// Tell express that the expressHandlebars is a template engine.
+app.engine('handlebars', expressHandlebars())
+
 // Set the rendering engine to be used.
-app.set('view engine', 'pug')
+app.set('view engine', 'handlebars')
 
 // Set the name of the directory where views are stored.
 app.set('views', path.join(__dirname, 'views'))

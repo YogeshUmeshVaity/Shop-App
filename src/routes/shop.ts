@@ -10,6 +10,8 @@ shopRoutes.get('/', (request: Request, response: Response) => {
         productList: products,
         pageTitle: 'Shop',
         routePath: '/',
-        hasProducts: products.length > 0
+        hasProducts: products.length > 0,
+        hasProductCSS: true,
+        isShopMenu: true
     })
 })

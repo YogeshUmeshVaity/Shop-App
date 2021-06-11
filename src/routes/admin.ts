@@ -5,7 +5,13 @@ export const adminRoutes = express.Router()
 export const products: Array<Product> = []
 
 adminRoutes.get('/add-product', (request: Request, response: Response) => {
-    response.render('add-product', { pageTitle: 'Add Product', routePath: '/admin/add-product' })
+    response.render('add-product', {
+        pageTitle: 'Add Product',
+        routePath: '/admin/add-product',
+        hasProductCSS: true,
+        hasFormsCSS: true,
+        isAddProductMenu: true
+    })
 })
 
 adminRoutes.post('/product', (request: Request, response: Response) => {

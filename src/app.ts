@@ -3,23 +3,11 @@ import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import { HttpException } from './exceptions/HttpException'
 import path from 'path'
-import expressHandlebars from 'express-handlebars'
 
 const app = express()
 
-// Tell express that the expressHandlebars is a template engine.
-// The engine name here (hbs in this case) must be the file extension for view files.
-app.engine(
-    'hbs',
-    expressHandlebars({
-        extname: 'hbs',
-        defaultLayout: 'main-layout',
-        layoutsDir: __dirname + '/views/layouts'
-    })
-)
-
 // Set the rendering engine to be used.
-app.set('view engine', 'hbs')
+app.set('view engine', 'ejs')
 
 // Set the name of the directory where views are stored.
 app.set('views', path.join(__dirname, 'views'))

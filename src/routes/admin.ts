@@ -1,21 +1,11 @@
-import express, { Request, Response } from 'express'
-import { Product } from '../models/product'
+import express from 'express'
+
+// Controllers
+import * as productController from '../controllers/product'
 
 export const adminRoutes = express.Router()
-export const products: Array<Product> = []
 
-adminRoutes.get('/add-product', (request: Request, response: Response) => {
-    response.render('add-product', {
-        pageTitle: 'Add Product',
-        routePath: '/admin/add-product',
-        hasProductCSS: true,
-        hasFormsCSS: true,
-        isAddProductMenu: true
-    })
-})
+adminRoutes.get('/add-product', productController.getAddProduct)
 
-adminRoutes.post('/product', (request: Request, response: Response) => {
-    console.log(request.body)
-    products.push({ title: request.body.title })
-    response.redirect('/')
-})
+adminRoutes.post('/product', productController.postAddProduct)
+

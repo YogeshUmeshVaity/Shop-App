@@ -1,8 +1,10 @@
-import express, { NextFunction, Request, Response } from 'express'
+import express from 'express'
 import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
-import { HttpException } from './exceptions/HttpException'
 import path from 'path'
+
+// Controllers
+import * as errorController from './controllers/error'
 
 const app = express()
 
@@ -20,13 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/admin', adminRoutes)
 app.use('/', shopRoutes)
 
-app.use((request: Request, response: Response) => {
-    response.status(404).render('404', { pageTitle: 'Page Not Found', routePath: '/404' })
-})
-
-app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {
-    err.status = 404
-    next(err)
-})
+app.use(errorController.get404)
 
 app.listen(3000)

@@ -20,7 +20,7 @@ export const postAddProduct = (request: Request, response: Response): void => {
 
 export const getProducts = async (request: Request, response: Response): Promise<void> => {
     const products = await Product.fetchAll()
-    response.render('shop', {
+    response.render('shop/product-list', {
         productList: products,
         pageTitle: 'Shop',
         routePath: '/',

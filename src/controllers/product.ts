@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { Product } from '../models/product'
 
 export const getAddProduct = (request: Request, response: Response): void => {
-    return response.render('add-product', {
+    return response.render('admin/add-product', {
         pageTitle: 'Add Product',
         routePath: '/admin/add-product',
         hasProductCSS: true,

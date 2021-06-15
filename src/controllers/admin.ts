@@ -4,10 +4,7 @@ import { Product } from '../models/product'
 export const getAddProduct = (request: Request, response: Response): void => {
     return response.render('admin/add-product', {
         pageTitle: 'Add Product',
-        routePath: '/admin/add-product',
-        hasProductCSS: true,
-        hasFormsCSS: true,
-        isAddProductMenu: true
+        routePath: '/admin/add-product'
     })
 }
 
@@ -23,9 +20,6 @@ export const getAdminProducts = async (request: Request, response: Response): Pr
     response.render('admin/product-list', {
         productList: products,
         pageTitle: 'Admin Products',
-        routePath: '/admin/products',
-        hasProducts: products.length > 0,
-        hasProductCSS: true,
-        isAdminProductsMenu: true
+        routePath: '/admin/products'
     })
 }

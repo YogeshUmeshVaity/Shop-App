@@ -6,3 +6,5 @@ export const shopRoutes = express.Router()
 shopRoutes.get('/', shopController.getIndex)
 
 shopRoutes.get('/products', shopController.getProducts)
+
+shopRoutes.get('/cart', shopController.getCart)

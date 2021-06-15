@@ -5,11 +5,8 @@ export const getProducts = async (request: Request, response: Response): Promise
     const products = await Product.fetchAll()
     response.render('shop/product-list', {
         productList: products,
-        pageTitle: 'Shop',
-        routePath: '/',
-        hasProducts: products.length > 0,
-        hasProductCSS: true,
-        isShopMenu: true
+        pageTitle: 'All Products',
+        routePath: '/products'
     })
 }
 
@@ -18,9 +15,13 @@ export const getIndex = async (request: Request, response: Response): Promise<vo
     response.render('shop/index', {
         productList: products,
         pageTitle: 'Shop',
-        routePath: '/',
-        hasProducts: products.length > 0,
-        hasProductCSS: true,
-        isShopMenu: true
+        routePath: '/'
+    })
+}
+
+export const getCart = (request: Request, response: Response): void => {
+    response.render('shop/cart', {
+        pageTitle: 'Your Cart',
+        routePath: '/cart'
     })
 }

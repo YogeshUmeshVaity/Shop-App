@@ -12,3 +12,15 @@ export const getProducts = async (request: Request, response: Response): Promise
         isShopMenu: true
     })
 }
+
+export const getIndex = async (request: Request, response: Response): Promise<void> => {
+    const products = await Product.fetchAll()
+    response.render('shop/index', {
+        productList: products,
+        pageTitle: 'Shop',
+        routePath: '/',
+        hasProducts: products.length > 0,
+        hasProductCSS: true,
+        isShopMenu: true
+    })
+}

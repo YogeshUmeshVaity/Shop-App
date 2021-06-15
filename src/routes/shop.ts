@@ -3,4 +3,6 @@ import * as shopController from '../controllers/shop'
 
 export const shopRoutes = express.Router()
 
-shopRoutes.get('/', shopController.getProducts)
+shopRoutes.get('/', shopController.getIndex)
+
+shopRoutes.get('/products', shopController.getProducts)

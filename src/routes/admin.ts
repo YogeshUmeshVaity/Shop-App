@@ -9,4 +9,3 @@ adminRoutes.get('/products', adminController.getAdminProducts)
 adminRoutes.get('/add-product', adminController.getAddProduct)
 
 adminRoutes.post('/product', adminController.postAddProduct)
-

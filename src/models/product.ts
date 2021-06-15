@@ -17,9 +17,15 @@ async function getProductsFromFile(): Promise<Array<Product>> {
 
 export class Product {
     title: string
+    imageUrl: string
+    description: string
+    price: number
 
-    constructor(title: string) {
+    constructor(title: string, imageUrl: string, description: string, price: number) {
         this.title = title
+        this.imageUrl = imageUrl
+        this.description = description
+        this.price = price
     }
 
     /**

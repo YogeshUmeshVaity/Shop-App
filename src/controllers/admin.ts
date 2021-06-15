@@ -10,7 +10,12 @@ export const getAddProduct = (request: Request, response: Response): void => {
 
 export const postAddProduct = (request: Request, response: Response): void => {
     console.log(request.body)
-    const product = new Product(request.body.title)
+    const product = new Product(
+        request.body.title,
+        request.body.imageUrl,
+        request.body.description,
+        request.body.price
+    )
     product.save()
     response.redirect('/')
 }

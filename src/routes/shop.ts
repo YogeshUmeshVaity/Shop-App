@@ -1,6 +1,6 @@
 import express from 'express'
-import * as productController from '../controllers/product'
+import * as shopController from '../controllers/shop'
 
 export const shopRoutes = express.Router()
 
-shopRoutes.get('/', productController.getProducts)
+shopRoutes.get('/', shopController.getProducts)

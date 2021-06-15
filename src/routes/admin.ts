@@ -1,12 +1,12 @@
 import express from 'express'
 
 // Controllers
-import * as productController from '../controllers/product'
+import * as adminController from '../controllers/admin'
 
 export const adminRoutes = express.Router()
-adminRoutes.get('/products', productController.getAdminProducts)
+adminRoutes.get('/products', adminController.getAdminProducts)
 
-adminRoutes.get('/add-product', productController.getAddProduct)
+adminRoutes.get('/add-product', adminController.getAddProduct)
 
-adminRoutes.post('/product', productController.postAddProduct)
+adminRoutes.post('/product', adminController.postAddProduct)
 

@@ -18,18 +18,6 @@ export const postAddProduct = (request: Request, response: Response): void => {
     response.redirect('/')
 }
 
-export const getProducts = async (request: Request, response: Response): Promise<void> => {
-    const products = await Product.fetchAll()
-    response.render('shop/product-list', {
-        productList: products,
-        pageTitle: 'Shop',
-        routePath: '/',
-        hasProducts: products.length > 0,
-        hasProductCSS: true,
-        isShopMenu: true
-    })
-}
-
 export const getAdminProducts = async (request: Request, response: Response): Promise<void> => {
     const products = await Product.fetchAll()
     response.render('admin/product-list', {

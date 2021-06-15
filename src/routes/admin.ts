@@ -4,6 +4,7 @@ import express from 'express'
 import * as productController from '../controllers/product'
 
 export const adminRoutes = express.Router()
+adminRoutes.get('/products', productController.getAdminProducts)
 
 adminRoutes.get('/add-product', productController.getAddProduct)
 

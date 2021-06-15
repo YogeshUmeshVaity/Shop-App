@@ -29,3 +29,15 @@ export const getProducts = async (request: Request, response: Response): Promise
         isShopMenu: true
     })
 }
+
+export const getAdminProducts = async (request: Request, response: Response): Promise<void> => {
+    const products = await Product.fetchAll()
+    response.render('admin/product-list', {
+        productList: products,
+        pageTitle: 'Admin Products',
+        routePath: '/admin/products',
+        hasProducts: products.length > 0,
+        hasProductCSS: true,
+        isAdminProductsMenu: true
+    })
+}

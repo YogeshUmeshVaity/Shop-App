@@ -9,4 +9,7 @@ shopRoutes.get('/products', shopController.getProducts)
 
 shopRoutes.get('/cart', shopController.getCart)
 
+shopRoutes.get('/orders', shopController.getOrders)
+
+
 shopRoutes.get('/checkout', shopController.getCheckout)

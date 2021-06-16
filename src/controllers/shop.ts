@@ -26,6 +26,13 @@ export const getCart = (request: Request, response: Response): void => {
     })
 }
 
+export const getOrders = (request: Request, response: Response): void => {
+    response.render('shop/orders', {
+        pageTitle: 'Your Orders',
+        routePath: '/orders'
+    })
+}
+
 export const getCheckout = (request: Request, response: Response): void => {
     response.render('shop/checkout', {
         pageTitle: 'Checkout',

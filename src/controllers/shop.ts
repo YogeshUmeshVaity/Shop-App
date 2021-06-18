@@ -10,6 +10,12 @@ export const getProducts = async (request: Request, response: Response): Promise
     })
 }
 
+export const getProductDetails = async (request: Request, response: Response): Promise<void> => {
+    const productId = request.params.productId
+    console.log(productId)
+    response.redirect('/')
+}
+
 export const getIndex = async (request: Request, response: Response): Promise<void> => {
     const products = await Product.fetchAll()
     response.render('shop/index', {

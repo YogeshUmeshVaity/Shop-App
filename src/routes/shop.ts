@@ -7,6 +7,8 @@ shopRoutes.get('/', shopController.getIndex)
 
 shopRoutes.get('/products', shopController.getProducts)
 
+shopRoutes.get('/products/:productId', shopController.getProductDetails)
+
 shopRoutes.get('/cart', shopController.getCart)
 
 shopRoutes.get('/orders', shopController.getOrders)

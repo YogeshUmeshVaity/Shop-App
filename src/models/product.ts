@@ -1,6 +1,12 @@
 import path from 'path'
 import { rootDirectory } from '../util/path'
-import { promises as fs } from 'fs' // functions in fs.promises return promises
+
+// functions in fs.promises return promises
+import { promises as fs } from 'fs' 
+
+// UUID generator: https://github.com/uuidjs/uuid
+// type definitions can be installed using: npm install --save @types/uuid
+import { v5 as uuid } from 'uuid'
 
 export const products: Array<Product> = []
 
@@ -16,12 +22,14 @@ async function getProductsFromFile(): Promise<Array<Product>> {
 }
 
 export class Product {
+    id: string
     title: string
     imageUrl: string
     description: string
     price: number
 
     constructor(title: string, imageUrl: string, description: string, price: number) {
+        this.id = uuid('http://example.com/hello', uuid.URL)
         this.title = title
         this.imageUrl = imageUrl
         this.description = description

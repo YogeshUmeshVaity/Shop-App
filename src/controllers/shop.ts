@@ -12,8 +12,12 @@ export const getProducts = async (request: Request, response: Response): Promise
 
 export const getProductDetails = async (request: Request, response: Response): Promise<void> => {
     const productId = request.params.productId
-    console.log(productId)
-    response.redirect('/')
+    try {
+        console.log(await Product.findProduct(productId))
+        response.redirect('/')
+    } catch (error: unknown) {
+        if (error instanceof Error) response.redirect('/404')
+    }
 }
 
 export const getIndex = async (request: Request, response: Response): Promise<void> => {

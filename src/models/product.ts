@@ -52,4 +52,15 @@ export class Product {
     static async fetchAll(): Promise<Array<Product>> {
         return await getProductsFromFile()
     }
+
+    static async findProduct(id: string): Promise<Product> {
+        const allProducts = await getProductsFromFile()
+        const requestedProduct = allProducts.find((product) => product.id === id)
+        if (requestedProduct) {
+            return requestedProduct
+        } else {
+            // This returns a rejected promise.
+            throw new Error('Cannot find the product with the requested ID.')
+        }
+    }
 }

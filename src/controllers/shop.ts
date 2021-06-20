@@ -13,8 +13,12 @@ export const getProducts = async (request: Request, response: Response): Promise
 export const getProductDetails = async (request: Request, response: Response): Promise<void> => {
     const productId = request.params.productId
     try {
-        console.log(await Product.findProduct(productId))
-        response.redirect('/')
+        const requestedProduct = await Product.findProduct(productId)
+        response.render('shop/product-details', {
+            product: requestedProduct,
+            pageTitle: requestedProduct.title,
+            routePath: '/products'
+        })
     } catch (error: unknown) {
         if (error instanceof Error) response.redirect('/404')
     }
@@ -34,6 +38,12 @@ export const getCart = (request: Request, response: Response): void => {
         pageTitle: 'Your Cart',
         routePath: '/cart'
     })
+}
+
+export const postCart = (request: Request, response: Response): void => {
+    const requestedProductId = request.body.productId
+    console.log(requestedProductId)
+    response.redirect('/cart')
 }
 
 export const getOrders = (request: Request, response: Response): void => {

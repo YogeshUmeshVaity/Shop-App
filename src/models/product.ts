@@ -2,7 +2,7 @@ import path from 'path'
 import { rootDirectory } from '../util/path'
 
 // functions in fs.promises return promises
-import { promises as fs } from 'fs' 
+import { promises as fs } from 'fs'
 
 // UUID generator: https://github.com/uuidjs/uuid
 // type definitions can be installed using: npm install --save @types/uuid

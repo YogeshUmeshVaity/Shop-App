@@ -11,6 +11,8 @@ shopRoutes.get('/products/:productId', shopController.getProductDetails)
 
 shopRoutes.get('/cart', shopController.getCart)
 
+shopRoutes.post('/cart', shopController.postCart)
+
 shopRoutes.get('/orders', shopController.getOrders)
 
 

@@ -59,7 +59,7 @@ export class Product {
         if (requestedProduct) {
             return requestedProduct
         } else {
-            // This returns a rejected promise.
+            // This implicitly returns a rejected promise.
             throw new Error('Cannot find the product with the requested ID.')
         }
     }

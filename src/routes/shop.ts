@@ -15,4 +15,4 @@ shopRoutes.post('/cart', shopController.postCart)
 
 shopRoutes.get('/orders', shopController.getOrders)
 
-shopRoutes.get('/checkout', shopController.getCheckout)
+// shopRoutes.get('/checkout', shopController.getCheckout)

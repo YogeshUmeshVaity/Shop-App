@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { Product } from '../models/product'
+import * as Cart from '../models/cart'
 
 export const getProducts = async (request: Request, response: Response): Promise<void> => {
     const products = await Product.fetchAll()
@@ -40,10 +41,15 @@ export const getCart = (request: Request, response: Response): void => {
     })
 }
 
-export const postCart = (request: Request, response: Response): void => {
-    const requestedProductId = request.body.productId
-    console.log(requestedProductId)
-    response.redirect('/cart')
+export const postCart = async (request: Request, response: Response): Promise<void> => {
+    const productId: string = request.body.productId
+    try {
+        const product = await Product.findProduct(productId)
+        Cart.addItem(productId, product.price)
+        response.redirect('/cart')
+    } catch (err) {
+        response.redirect('/404')
+    }
 }
 
 export const getOrders = (request: Request, response: Response): void => {

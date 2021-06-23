@@ -8,4 +8,6 @@ adminRoutes.get('/products', adminController.getAdminProducts)
 
 adminRoutes.get('/add-product', adminController.getAddProduct)
 
-adminRoutes.post('/product', adminController.postAddProduct)
+adminRoutes.get('/edit-product/:productId', adminController.getEditProduct)
+
+adminRoutes.post('/add-product', adminController.postAddProduct)

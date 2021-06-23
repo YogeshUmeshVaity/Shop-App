@@ -55,3 +55,9 @@ export const getAdminProducts = async (request: Request, response: Response): Pr
         routePath: '/admin/products'
     })
 }
+
+export const postDeleteProduct = async (request: Request, response: Response): Promise<void> => {
+    const deletedProductId = request.params.productId
+    await Product.delete(deletedProductId)
+    return response.redirect('/admin/products')
+}

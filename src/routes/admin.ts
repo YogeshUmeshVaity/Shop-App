@@ -14,3 +14,5 @@ adminRoutes.post('/add-product', adminController.postAddProduct)
 adminRoutes.get('/edit-product/:productId', adminController.getEditProduct)
 
 adminRoutes.post('/edit-product', adminController.postEditProduct)
+
+adminRoutes.post('/delete-product/:productId', adminController.postDeleteProduct)

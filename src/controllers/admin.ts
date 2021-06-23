@@ -37,6 +37,17 @@ export const getEditProduct = async (request: Request, response: Response): Prom
     }
 }
 
+export const postEditProduct = async (request: Request, response: Response): Promise<void> => {
+    await Product.update(
+        request.body.productId,
+        request.body.title,
+        request.body.imageUrl,
+        request.body.description,
+        request.body.price
+    )
+    return response.redirect('/admin/products')
+}
+
 export const getAdminProducts = async (request: Request, response: Response): Promise<void> => {
     const products = await Product.fetchAll()
     response.render('admin/product-list', {

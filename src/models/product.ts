@@ -29,7 +29,7 @@ export class Product {
     price: number
 
     constructor(title: string, imageUrl: string, description: string, price: number) {
-        this.id = uuid('http://example.com/hello', uuid.URL)
+        this.id = uuid('http://yourcompany.com/hello', uuid.URL)
         this.title = title
         this.imageUrl = imageUrl
         this.description = description
@@ -47,6 +47,23 @@ export class Product {
         } catch (err) {
             console.log(err)
         }
+    }
+
+    static async update(
+        id: string,
+        title: string,
+        imageUrl: string,
+        description: string,
+        price: number
+    ): Promise<void> {
+        const allProducts = await this.fetchAll()
+        const updatedProductIndex = allProducts.findIndex((product) => product.id === id)
+        console.log(updatedProductIndex)
+        allProducts[updatedProductIndex].title = title
+        allProducts[updatedProductIndex].imageUrl = imageUrl
+        allProducts[updatedProductIndex].description = description
+        allProducts[updatedProductIndex].price = price
+        await fs.writeFile(filePath, JSON.stringify(allProducts))
     }
 
     static async fetchAll(): Promise<Array<Product>> {

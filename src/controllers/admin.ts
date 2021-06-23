@@ -11,14 +11,13 @@ export const getAddProduct = (request: Request, response: Response): void => {
 
 export const postAddProduct = (request: Request, response: Response): void => {
     console.log(request.body)
-    const product = new Product(
+    Product.save(
         request.body.title,
         request.body.imageUrl,
         request.body.description,
         request.body.price
     )
-    product.save()
-    response.redirect('/')
+    return response.redirect('/')
 }
 
 export const getEditProduct = async (request: Request, response: Response): Promise<void> => {

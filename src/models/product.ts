@@ -6,7 +6,14 @@ import { promises as fs } from 'fs'
 
 // UUID generator: https://github.com/uuidjs/uuid
 // type definitions can be installed using: npm install --save @types/uuid
-import { v5 as uuid } from 'uuid'
+import { v4 as uuid } from 'uuid'
+
+const uuidV4Options = {
+    random: [
+        0x10, 0x91, 0x56, 0xbe, 0xc4, 0xfb, 0xc1, 0xea, 0x71, 0xb4, 0xef, 0xe1, 0x67, 0x1c, 0x58,
+        0x36
+    ]
+}
 
 export const products: Array<Product> = []
 
@@ -28,8 +35,8 @@ export class Product {
     description: string
     price: number
 
-    constructor(title: string, imageUrl: string, description: string, price: number) {
-        this.id = uuid('http://yourcompany.com/hello', uuid.URL)
+    constructor(id: string, title: string, imageUrl: string, description: string, price: number) {
+        this.id = id
         this.title = title
         this.imageUrl = imageUrl
         this.description = description
@@ -39,9 +46,15 @@ export class Product {
     /**
      * Appends this product to the current products in the file.
      */
-    async save(): Promise<void> {
+    static async save(
+        title: string,
+        imageUrl: string,
+        description: string,
+        price: number
+    ): Promise<void> {
         const currentProducts = await getProductsFromFile()
-        currentProducts.push(this)
+        const newProduct = new Product(uuid(), title, imageUrl, description, price)
+        currentProducts.push(newProduct)
         try {
             fs.writeFile(filePath, JSON.stringify(currentProducts))
         } catch (err) {

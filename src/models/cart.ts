@@ -20,6 +20,24 @@ export async function addItem(newItemId: string, price: number): Promise<void> {
     saveCartToFile(cart)
 }
 
+export async function removeItem(itemId: string, price: number): Promise<void> {
+    const cart = await getCartFromFile()
+    const removedItem = findExistingItemIn(cart.items, itemId)
+    if (removedItem) {
+        removeItemFrom(cart, removedItem)
+        decreaseTotalPrice(cart, price, removedItem)
+        saveCartToFile(cart)
+    }
+}
+
+function removeItemFrom(cart: Cart, removedItem: CartItem) {
+    cart.items = cart.items.filter((item) => item.id !== removedItem.id)
+}
+
+function decreaseTotalPrice(cart: Cart, price: number, removedItem: CartItem) {
+    cart.totalPrice = cart.totalPrice - price * removedItem.quantity
+}
+
 const cartFilePath = path.join(rootDirectory(), 'data', 'cart.json')
 
 async function getCartFromFile(): Promise<Cart> {

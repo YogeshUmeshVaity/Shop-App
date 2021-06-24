@@ -1,5 +1,6 @@
 import path from 'path'
 import { rootDirectory } from '../util/path'
+import * as Cart from '../models/cart'
 
 // functions in fs.promises return promises
 import { promises as fs } from 'fs'
@@ -75,13 +76,14 @@ export class Product {
 
     static async delete(productId: string): Promise<void> {
         const allProducts = await Product.fetchAll()
+        const productPrice = (await Product.findProduct(productId)).price
         // By filtering, exclude the product to be deleted.
         const filteredProducts = allProducts.filter((product) => {
-            console.log(`actual ID: ${product.id}`)
-            console.log(`deleted ID: ${productId}`)
             return product.id !== productId
         })
+
         await fs.writeFile(filePath, JSON.stringify(filteredProducts))
+        Cart.removeItem(productId, productPrice)
     }
 
     static async fetchAll(): Promise<Array<Product>> {

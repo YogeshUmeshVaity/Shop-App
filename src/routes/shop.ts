@@ -13,6 +13,8 @@ shopRoutes.get('/cart', shopController.getCart)
 
 shopRoutes.post('/cart', shopController.postCart)
 
+shopRoutes.post('/delete-cart-item', shopController.deleteCartItem)
+
 shopRoutes.get('/orders', shopController.getOrders)
 
 // shopRoutes.get('/checkout', shopController.getCheckout)

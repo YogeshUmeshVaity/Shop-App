@@ -41,6 +41,10 @@ function removeItemFrom(cart: Cart, removedItem: CartItem) {
 
 function decreaseTotalPrice(cart: Cart, price: number, removedItem: CartItem) {
     cart.totalPrice = cart.totalPrice - price * removedItem.quantity
+    // Takes care of remaining fractions after deleting the items.
+    if (cart.items.length === 0) {
+        cart.totalPrice = 0
+    }
 }
 
 const cartFilePath = path.join(rootDirectory(), 'data', 'cart.json')

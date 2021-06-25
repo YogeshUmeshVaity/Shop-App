@@ -54,6 +54,13 @@ export const postCart = async (request: Request, response: Response): Promise<vo
     }
 }
 
+export const deleteCartItem = async (request: Request, response: Response): Promise<void> => {
+    const itemId: string = request.body.itemId
+    const product = await Product.findProduct(itemId)
+    await Cart.removeItem(itemId, product.price)
+    response.redirect('/cart')
+}
+
 export const getOrders = (request: Request, response: Response): void => {
     response.render('shop/orders', {
         pageTitle: 'Your Orders',

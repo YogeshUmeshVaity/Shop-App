@@ -34,7 +34,16 @@ export const getIndex = async (request: Request, response: Response): Promise<vo
     })
 }
 
-export const getCart = (request: Request, response: Response): void => {
+export const getCart = async (request: Request, response: Response): Promise<void> => {
+    // const cartItems = await Cart.getItems()
+    // const allProducts = await Product.fetchAll()
+    // let cartProducts: Array<Product>
+    // // Get the products that match the IDs from the cart.
+    // allProducts.forEach((product) => {
+    //     if (cartItems.find((items) => items.id === product.id)) {
+    //         cartProducts.push(product)
+    //     }
+    // })
     response.render('shop/cart', {
         pageTitle: 'Your Cart',
         routePath: '/cart'
@@ -45,7 +54,7 @@ export const postCart = async (request: Request, response: Response): Promise<vo
     const productId: string = request.body.productId
     try {
         const product = await Product.findProduct(productId)
-        Cart.addItem(productId, product.price)
+        Cart.addItem(product, product.price)
         response.redirect('/cart')
     } catch (err) {
         response.redirect('/404')

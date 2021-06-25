@@ -1,9 +1,10 @@
 import path from 'path'
 import { rootDirectory } from '../util/path'
 import { promises as fs } from 'fs'
+import { Product } from './product'
 
 interface CartItem {
-    id: string
+    product: Product
     quantity: number
 }
 
@@ -12,17 +13,17 @@ export class Cart {
     totalPrice = 0
 }
 
-export async function addItem(newItemId: string, price: number): Promise<void> {
+export async function addItem(newProduct: Product, price: number): Promise<void> {
     const cart = await getCartFromFile()
-    const existingItem = findExistingItemIn(cart.items, newItemId)
-    increaseExistingQuantityOrAddNewItem(existingItem, cart, newItemId)
+    const existingItem = findExistingItem(cart.items, newProduct)
+    increaseExistingQuantityOrAddNewItem(existingItem, cart, newProduct)
     increaseTotalPrice(cart, price)
     saveCartToFile(cart)
 }
 
 export async function removeItem(itemId: string, price: number): Promise<void> {
     const cart = await getCartFromFile()
-    const removedItem = findExistingItemIn(cart.items, itemId)
+    const removedItem = findExistingItemById(cart.items, itemId)
     if (removedItem) {
         removeItemFrom(cart, removedItem)
         decreaseTotalPrice(cart, price, removedItem)
@@ -30,8 +31,13 @@ export async function removeItem(itemId: string, price: number): Promise<void> {
     }
 }
 
+// export async function getItems(): Promise<CartItem[]> {
+//     const cart = await getCartFromFile()
+//     return cart.items
+// }
+
 function removeItemFrom(cart: Cart, removedItem: CartItem) {
-    cart.items = cart.items.filter((item) => item.id !== removedItem.id)
+    cart.items = cart.items.filter((item) => item.product.id !== removedItem.product.id)
 }
 
 function decreaseTotalPrice(cart: Cart, price: number, removedItem: CartItem) {
@@ -61,18 +67,25 @@ function increaseTotalPrice(cart: Cart, price: number) {
 function increaseExistingQuantityOrAddNewItem(
     existingItem: CartItem | undefined,
     cart: Cart,
-    newItemId: string
+    newProduct: Product
 ) {
     if (existingItem) {
         existingItem.quantity++
     } else {
-        cart.items.push({ id: newItemId, quantity: 1 })
+        cart.items.push({ product: newProduct, quantity: 1 })
     }
 }
 
-function findExistingItemIn(
+function findExistingItem(
+    currentCartItems: Array<CartItem>,
+    newProduct: Product
+): CartItem | undefined {
+    return currentCartItems.find((cartItem) => cartItem.product.id === newProduct.id)
+}
+
+function findExistingItemById(
     currentCartItems: Array<CartItem>,
     newProductId: string
 ): CartItem | undefined {
-    return currentCartItems.find((cartItem) => cartItem.id === newProductId)
+    return currentCartItems.find((cartItem) => cartItem.product.id === newProductId)
 }

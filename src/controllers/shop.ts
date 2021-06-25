@@ -35,18 +35,11 @@ export const getIndex = async (request: Request, response: Response): Promise<vo
 }
 
 export const getCart = async (request: Request, response: Response): Promise<void> => {
-    // const cartItems = await Cart.getItems()
-    // const allProducts = await Product.fetchAll()
-    // let cartProducts: Array<Product>
-    // // Get the products that match the IDs from the cart.
-    // allProducts.forEach((product) => {
-    //     if (cartItems.find((items) => items.id === product.id)) {
-    //         cartProducts.push(product)
-    //     }
-    // })
+    const cart = await Cart.getCart()
     response.render('shop/cart', {
         pageTitle: 'Your Cart',
-        routePath: '/cart'
+        routePath: '/cart',
+        cartItems: cart.items
     })
 }
 

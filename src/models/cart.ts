@@ -31,10 +31,9 @@ export async function removeItem(itemId: string, price: number): Promise<void> {
     }
 }
 
-// export async function getItems(): Promise<CartItem[]> {
-//     const cart = await getCartFromFile()
-//     return cart.items
-// }
+export async function getCart(): Promise<Cart> {
+    return await getCartFromFile()
+}
 
 function removeItemFrom(cart: Cart, removedItem: CartItem) {
     cart.items = cart.items.filter((item) => item.product.id !== removedItem.product.id)

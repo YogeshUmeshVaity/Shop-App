@@ -1,6 +1,7 @@
 import path from 'path'
 import { rootDirectory } from '../util/path'
 import * as Cart from '../models/cart'
+import { databasePool as database } from '../util/database'
 
 // functions in fs.promises return promises
 import { promises as fs } from 'fs'
@@ -47,14 +48,10 @@ export class Product {
         description: string,
         price: number
     ): Promise<void> {
-        const currentProducts = await getProductsFromFile()
-        const newProduct = new Product(uuid(), title, imageUrl, description, price)
-        currentProducts.push(newProduct)
-        try {
-            fs.writeFile(filePath, JSON.stringify(currentProducts))
-        } catch (err) {
-            console.log(err)
-        }
+        database.execute(
+            'INSERT INTO products (id, title, price, description, imageUrl) VALUES (?, ?, ?, ?, ?)',
+            [uuid(), title, price, description, imageUrl]
+        )
     }
 
     static async update(
@@ -87,7 +84,8 @@ export class Product {
     }
 
     static async fetchAll(): Promise<Array<Product>> {
-        return await getProductsFromFile()
+        const result = await database.execute('SELECT * FROM products')
+        return JSON.parse(JSON.stringify(result[0]))
     }
 
     static async findProduct(id: string): Promise<Product> {

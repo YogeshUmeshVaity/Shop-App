@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import { Product } from '../models/product'
 import * as Cart from '../models/cart'
+import { databasePool as database } from '../util/database'
+import { RowDataPacket } from 'mysql2'
 
 export const getProducts = async (request: Request, response: Response): Promise<void> => {
     const products = await Product.fetchAll()
@@ -26,6 +28,7 @@ export const getProductDetails = async (request: Request, response: Response): P
 }
 
 export const getIndex = async (request: Request, response: Response): Promise<void> => {
+    // await testDatabase()
     const products = await Product.fetchAll()
     response.render('shop/index', {
         productList: products,
@@ -73,4 +76,11 @@ export const getCheckout = (request: Request, response: Response): void => {
         pageTitle: 'Checkout',
         routePath: '/checkout'
     })
+}
+
+async function testDatabase() {
+    const result = await database.execute('SELECT * FROM products')
+    console.log('From database', JSON.parse(JSON.stringify(result[0])))
+    const allProducts: Array<Product> = JSON.parse(JSON.stringify(result[0]))
+    allProducts[0].id
 }

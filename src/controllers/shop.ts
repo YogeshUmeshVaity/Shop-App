@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import { Product } from '../models/product'
 import * as Cart from '../models/cart'
 import { databasePool as database } from '../util/database'
-import { RowDataPacket } from 'mysql2'
 
 export const getProducts = async (request: Request, response: Response): Promise<void> => {
     const products = await Product.fetchAll()
@@ -17,6 +16,7 @@ export const getProductDetails = async (request: Request, response: Response): P
     const productId = request.params.productId
     try {
         const requestedProduct = await Product.findProduct(productId)
+        console.log('Request product details: ', requestedProduct)
         response.render('shop/product-details', {
             product: requestedProduct,
             pageTitle: requestedProduct.title,

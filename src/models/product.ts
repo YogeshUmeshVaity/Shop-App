@@ -89,11 +89,13 @@ export class Product {
     }
 
     static async findProduct(id: string): Promise<Product> {
-        const allProducts = await getProductsFromFile()
-        const requestedProduct = allProducts.find((product) => product.id === id)
-        if (requestedProduct) {
-            return requestedProduct
-        } else {
+        try {
+            const result = await database.execute('SELECT * FROM products WHERE products.id = ?', [
+                id
+            ])
+            // The 0 at the end means we are taking the first element from the JSON converted array
+            return JSON.parse(JSON.stringify(result[0]))[0]
+        } catch {
             // This implicitly returns a rejected promise.
             throw new Error('Cannot find the product with the requested ID.')
         }

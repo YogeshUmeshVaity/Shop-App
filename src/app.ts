@@ -2,6 +2,8 @@ import express from 'express'
 import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import path from 'path'
+import { sequelize } from './util/database'
+
 
 // Controllers
 import * as errorController from './controllers/error'
@@ -24,4 +26,10 @@ app.use('/', shopRoutes)
 
 app.use(errorController.get404)
 
-app.listen(3000)
+sequelize
+    .sync()
+    .then((result) => {
+        console.log(result)
+        app.listen(3000)
+    })
+    .catch((err) => console.log(err))

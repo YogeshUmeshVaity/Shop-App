@@ -10,54 +10,54 @@ export const getAddProduct = (request: Request, response: Response): void => {
 }
 
 export const postAddProduct = (request: Request, response: Response): void => {
-    console.log(request.body)
-    Product.save(
-        request.body.title,
-        request.body.imageUrl,
-        request.body.description,
-        request.body.price
-    )
-    return response.redirect('/')
+    // console.log(request.body)
+    // Product.save(
+    //     request.body.title,
+    //     request.body.imageUrl,
+    //     request.body.description,
+    //     request.body.price
+    // )
+    // return response.redirect('/')
 }
 
 export const getEditProduct = async (request: Request, response: Response): Promise<void> => {
-    const productId = request.params.productId
-    try {
-        const productToEdit = await Product.findProduct(productId)
-        return response.render('admin/edit-product', {
-            pageTitle: 'Edit Product',
-            routePath: '/admin/edit-product',
-            isEditingMode: true,
-            productToEdit: productToEdit
-        })
-    } catch {
-        // Product not found
-        return response.render('/404')
-    }
+    // const productId = request.params.productId
+    // try {
+    //     const productToEdit = await Product.findProduct(productId)
+    //     return response.render('admin/edit-product', {
+    //         pageTitle: 'Edit Product',
+    //         routePath: '/admin/edit-product',
+    //         isEditingMode: true,
+    //         productToEdit: productToEdit
+    //     })
+    // } catch {
+    //     // Product not found
+    //     return response.render('/404')
+    // }
 }
 
 export const postEditProduct = async (request: Request, response: Response): Promise<void> => {
-    await Product.update(
-        request.body.productId,
-        request.body.title,
-        request.body.imageUrl,
-        request.body.description,
-        request.body.price
-    )
-    return response.redirect('/admin/products')
+    // await Product.update(
+    //     request.body.productId,
+    //     request.body.title,
+    //     request.body.imageUrl,
+    //     request.body.description,
+    //     request.body.price
+    // )
+    // return response.redirect('/admin/products')
 }
 
 export const getAdminProducts = async (request: Request, response: Response): Promise<void> => {
-    const products = await Product.fetchAll()
-    response.render('admin/product-list', {
-        productList: products,
-        pageTitle: 'Admin Products',
-        routePath: '/admin/products'
-    })
+    // const products = await Product.fetchAll()
+    // response.render('admin/product-list', {
+    //     productList: products,
+    //     pageTitle: 'Admin Products',
+    //     routePath: '/admin/products'
+    // })
 }
 
 export const postDeleteProduct = async (request: Request, response: Response): Promise<void> => {
-    const deletedProductId = request.params.productId
-    await Product.delete(deletedProductId)
-    return response.redirect('/admin/products')
+    // const deletedProductId = request.params.productId
+    // await Product.delete(deletedProductId)
+    // return response.redirect('/admin/products')
 }

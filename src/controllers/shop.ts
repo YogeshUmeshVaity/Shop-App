@@ -1,40 +1,39 @@
 import { Request, Response } from 'express'
 import { Product } from '../models/product'
 import * as Cart from '../models/cart'
-import { databasePool as database } from '../util/database'
 
 export const getProducts = async (request: Request, response: Response): Promise<void> => {
-    const products = await Product.fetchAll()
-    response.render('shop/product-list', {
-        productList: products,
-        pageTitle: 'All Products',
-        routePath: '/products'
-    })
+    // const products = await Product.fetchAll()
+    // response.render('shop/product-list', {
+    //     productList: products,
+    //     pageTitle: 'All Products',
+    //     routePath: '/products'
+    // })
 }
 
 export const getProductDetails = async (request: Request, response: Response): Promise<void> => {
-    const productId = request.params.productId
-    try {
-        const requestedProduct = await Product.findProduct(productId)
-        console.log('Request product details: ', requestedProduct)
-        response.render('shop/product-details', {
-            product: requestedProduct,
-            pageTitle: requestedProduct.title,
-            routePath: '/products'
-        })
-    } catch (error: unknown) {
-        if (error instanceof Error) response.redirect('/404')
-    }
+    // const productId = request.params.productId
+    // try {
+    //     const requestedProduct = await Product.findProduct(productId)
+    //     console.log('Request product details: ', requestedProduct)
+    //     response.render('shop/product-details', {
+    //         product: requestedProduct,
+    //         pageTitle: requestedProduct.title,
+    //         routePath: '/products'
+    //     })
+    // } catch (error: unknown) {
+    //     if (error instanceof Error) response.redirect('/404')
+    // }
 }
 
 export const getIndex = async (request: Request, response: Response): Promise<void> => {
     // await testDatabase()
-    const products = await Product.fetchAll()
-    response.render('shop/index', {
-        productList: products,
-        pageTitle: 'Shop',
-        routePath: '/'
-    })
+    // const products = await Product.fetchAll()
+    // response.render('shop/index', {
+    //     productList: products,
+    //     pageTitle: 'Shop',
+    //     routePath: '/'
+    // })
 }
 
 export const getCart = async (request: Request, response: Response): Promise<void> => {
@@ -47,21 +46,21 @@ export const getCart = async (request: Request, response: Response): Promise<voi
 }
 
 export const postCart = async (request: Request, response: Response): Promise<void> => {
-    const productId: string = request.body.productId
-    try {
-        const product = await Product.findProduct(productId)
-        Cart.addItem(product, product.price)
-        response.redirect('/cart')
-    } catch (err) {
-        response.redirect('/404')
-    }
+    // const productId: string = request.body.productId
+    // try {
+    //     const product = await Product.findProduct(productId)
+    //     Cart.addItem(product, product.price)
+    //     response.redirect('/cart')
+    // } catch (err) {
+    //     response.redirect('/404')
+    // }
 }
 
 export const deleteCartItem = async (request: Request, response: Response): Promise<void> => {
-    const itemId: string = request.body.itemId
-    const product = await Product.findProduct(itemId)
-    await Cart.removeItem(itemId, product.price)
-    response.redirect('/cart')
+    // const itemId: string = request.body.itemId
+    // const product = await Product.findProduct(itemId)
+    // await Cart.removeItem(itemId, product.price)
+    // response.redirect('/cart')
 }
 
 export const getOrders = (request: Request, response: Response): void => {
@@ -79,8 +78,8 @@ export const getCheckout = (request: Request, response: Response): void => {
 }
 
 async function testDatabase() {
-    const result = await database.execute('SELECT * FROM products')
-    console.log('From database', JSON.parse(JSON.stringify(result[0])))
-    const allProducts: Array<Product> = JSON.parse(JSON.stringify(result[0]))
-    allProducts[0].id
+    // const result = await database.execute('SELECT * FROM products')
+    // console.log('From database', JSON.parse(JSON.stringify(result[0])))
+    // const allProducts: Array<Product> = JSON.parse(JSON.stringify(result[0]))
+    // allProducts[0].id
 }

@@ -2,13 +2,20 @@ import { NextFunction, Request, Response } from 'express'
 import { Product } from '../models/product'
 import * as Cart from '../models/cart'
 
-export const getProducts = async (request: Request, response: Response): Promise<void> => {
-    // const products = await Product.fetchAll()
-    // response.render('shop/product-list', {
-    //     productList: products,
-    //     pageTitle: 'All Products',
-    //     routePath: '/products'
-    // })
+export const getProducts = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        response.render('shop/index', {
+            productList: await Product.findAll(),
+            pageTitle: 'All Products',
+            routePath: '/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getProductDetails = async (request: Request, response: Response): Promise<void> => {

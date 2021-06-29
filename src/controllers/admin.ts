@@ -50,15 +50,25 @@ export const getEditProduct = async (
     }
 }
 
-export const postEditProduct = async (request: Request, response: Response): Promise<void> => {
-    // await Product.update(
-    //     request.body.productId,
-    //     request.body.title,
-    //     request.body.imageUrl,
-    //     request.body.description,
-    //     request.body.price
-    // )
-    // return response.redirect('/admin/products')
+export const postEditProduct = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        await Product.update(
+            {
+                title: request.body.title,
+                imageUrl: request.body.imageUrl,
+                description: request.body.description,
+                price: request.body.price
+            },
+            { where: { id: request.body.productId } }
+        )
+        return response.redirect('/admin/products')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getProducts = async (

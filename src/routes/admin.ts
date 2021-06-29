@@ -5,7 +5,7 @@ import * as adminController from '../controllers/admin'
 
 export const adminRoutes = express.Router()
 
-adminRoutes.get('/products', adminController.getAdminProducts)
+adminRoutes.get('/products', adminController.getProducts)
 
 adminRoutes.get('/add-product', adminController.getAddProduct)
 

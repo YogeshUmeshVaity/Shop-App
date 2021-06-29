@@ -55,13 +55,20 @@ export const postEditProduct = async (request: Request, response: Response): Pro
     // return response.redirect('/admin/products')
 }
 
-export const getAdminProducts = async (request: Request, response: Response): Promise<void> => {
-    // const products = await Product.fetchAll()
-    // response.render('admin/product-list', {
-    //     productList: products,
-    //     pageTitle: 'Admin Products',
-    //     routePath: '/admin/products'
-    // })
+export const getProducts = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        response.render('admin/product-list', {
+            productList: await Product.findAll(),
+            pageTitle: 'Admin Products',
+            routePath: '/admin/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postDeleteProduct = async (request: Request, response: Response): Promise<void> => {

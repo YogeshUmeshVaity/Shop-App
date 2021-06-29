@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { Product } from '../models/product'
 import * as Cart from '../models/cart'
 
@@ -26,14 +26,20 @@ export const getProductDetails = async (request: Request, response: Response): P
     // }
 }
 
-export const getIndex = async (request: Request, response: Response): Promise<void> => {
-    // await testDatabase()
-    // const products = await Product.fetchAll()
-    // response.render('shop/index', {
-    //     productList: products,
-    //     pageTitle: 'Shop',
-    //     routePath: '/'
-    // })
+export const getIndex = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        response.render('shop/index', {
+            productList: await Product.findAll(),
+            pageTitle: 'Shop',
+            routePath: '/'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getCart = async (request: Request, response: Response): Promise<void> => {

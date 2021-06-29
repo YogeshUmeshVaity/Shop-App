@@ -1,3 +1,6 @@
+// Setup instructions for sequelize-typescript can be found at:
+// https://github.com/RobinBuschmann/sequelize-typescript
+
 import { Sequelize } from 'sequelize-typescript'
 import { Product } from '../models/product'
 

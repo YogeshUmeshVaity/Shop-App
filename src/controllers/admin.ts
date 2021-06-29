@@ -28,20 +28,26 @@ export const postAddProduct = async (
     }
 }
 
-export const getEditProduct = async (request: Request, response: Response): Promise<void> => {
-    // const productId = request.params.productId
-    // try {
-    //     const productToEdit = await Product.findProduct(productId)
-    //     return response.render('admin/edit-product', {
-    //         pageTitle: 'Edit Product',
-    //         routePath: '/admin/edit-product',
-    //         isEditingMode: true,
-    //         productToEdit: productToEdit
-    //     })
-    // } catch {
-    //     // Product not found
-    //     return response.render('/404')
-    // }
+export const getEditProduct = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const productId = request.params.productId
+    try {
+        const productToEdit = await Product.findByPk(productId)
+        if (!productToEdit) {
+            response.redirect('/')
+        }
+        response.render('admin/edit-product', {
+            pageTitle: 'Edit Product',
+            routePath: '/admin/edit-product',
+            isEditingMode: true,
+            productToEdit: productToEdit
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postEditProduct = async (request: Request, response: Response): Promise<void> => {

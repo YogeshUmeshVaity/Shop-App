@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { Product } from '../models/product'
 import * as Cart from '../models/cart'
+import { rejects } from 'assert'
 
 export const getProducts = async (
     request: Request,
@@ -8,7 +9,7 @@ export const getProducts = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        response.render('shop/index', {
+        response.render('shop/product-list', {
             productList: await Product.findAll(),
             pageTitle: 'All Products',
             routePath: '/products'
@@ -18,19 +19,22 @@ export const getProducts = async (
     }
 }
 
-export const getProductDetails = async (request: Request, response: Response): Promise<void> => {
-    // const productId = request.params.productId
-    // try {
-    //     const requestedProduct = await Product.findProduct(productId)
-    //     console.log('Request product details: ', requestedProduct)
-    //     response.render('shop/product-details', {
-    //         product: requestedProduct,
-    //         pageTitle: requestedProduct.title,
-    //         routePath: '/products'
-    //     })
-    // } catch (error: unknown) {
-    //     if (error instanceof Error) response.redirect('/404')
-    // }
+export const getProductDetails = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const productId = request.params.productId
+    try {
+        const requestedProduct = await Product.findByPk(productId, { rejectOnEmpty: true })
+        response.render('shop/product-details', {
+            product: requestedProduct,
+            pageTitle: requestedProduct.title,
+            routePath: '/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getIndex = async (

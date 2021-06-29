@@ -1,5 +1,10 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { Product } from '../models/product'
+
+// UUID generator: https://github.com/uuidjs/uuid
+// type definitions can be installed using: npm install --save @types/uuid
+// To get random values every time, don't specify any options while calling uuid() function.
+import { v4 as uuid } from 'uuid'
 
 export const getAddProduct = (request: Request, response: Response): void => {
     return response.render('admin/edit-product', {
@@ -9,15 +14,18 @@ export const getAddProduct = (request: Request, response: Response): void => {
     })
 }
 
-export const postAddProduct = (request: Request, response: Response): void => {
-    // console.log(request.body)
-    // Product.save(
-    //     request.body.title,
-    //     request.body.imageUrl,
-    //     request.body.description,
-    //     request.body.price
-    // )
-    // return response.redirect('/')
+export const postAddProduct = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        console.log('Request body:', request.body)
+        await Product.create({ id: uuid(), ...request.body })
+        response.redirect('/')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getEditProduct = async (request: Request, response: Response): Promise<void> => {

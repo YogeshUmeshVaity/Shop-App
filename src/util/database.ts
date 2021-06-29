@@ -8,5 +8,5 @@ export const sequelize = new Sequelize({
     host: 'localhost',
     username: 'root',
     password: '1234567#',
-    models: [Product]
+    models: [Product] // Every newly added model(table) should be added here.
 })

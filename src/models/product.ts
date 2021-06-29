@@ -1,4 +1,3 @@
-import { count } from 'console'
 import {
     Model,
     Column,
@@ -10,13 +9,8 @@ import {
     DataType
 } from 'sequelize-typescript'
 
-// UUID generator: https://github.com/uuidjs/uuid
-// type definitions can be installed using: npm install --save @types/uuid
-// To get random values every time, don't specify any options while calling uuid() function.
-import { v4 as uuid } from 'uuid'
-
 @Table
-export class Product extends Model<Product> {
+export class Product extends Model {
     @Column({ primaryKey: true })
     id!: string
 

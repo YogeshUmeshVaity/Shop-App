@@ -5,7 +5,6 @@ import { Product } from '../models/product'
 // type definitions can be installed using: npm install --save @types/uuid
 // To get random values every time, don't specify any options while calling uuid() function.
 import { v4 as uuid } from 'uuid'
-import { where } from 'sequelize/types'
 
 export const getAddProduct = (request: Request, response: Response): void => {
     return response.render('admin/edit-product', {

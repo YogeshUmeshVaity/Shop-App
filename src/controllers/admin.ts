@@ -26,7 +26,7 @@ export const postAddProduct = async (
                 id: uuid(),
                 ...request.body,
                 price: parseFloat(request.body.price),
-                createdByUserId: '1'
+                createdByUserId: request.user?.id
             }
         })
         response.redirect('/')

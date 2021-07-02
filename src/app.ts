@@ -2,8 +2,6 @@ import express from 'express'
 import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import path from 'path'
-import { sequelize } from './util/database'
-
 
 // Controllers
 import * as errorController from './controllers/error'

@@ -14,3 +14,6 @@
 //     password: '1234567#',
 //     models: [Product, User] // Every newly added model(table) should be added here.
 // })
+
+import { PrismaClient } from '@prisma/client'
+export const db = new PrismaClient()

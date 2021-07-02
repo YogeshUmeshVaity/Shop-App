@@ -1,22 +1,20 @@
 import { NextFunction, Request, Response } from 'express'
-import { Product } from '../models/product'
-import * as Cart from '../models/cart'
-import { rejects } from 'assert'
+import { db } from '../util/database'
 
 export const getProducts = async (
     request: Request,
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    try {
-        response.render('shop/product-list', {
-            productList: await Product.findAll(),
-            pageTitle: 'All Products',
-            routePath: '/products'
-        })
-    } catch (error) {
-        next(error)
-    }
+    // try {
+    //     response.render('shop/product-list', {
+    //         productList: await Product.findAll(),
+    //         pageTitle: 'All Products',
+    //         routePath: '/products'
+    //     })
+    // } catch (error) {
+    //     next(error)
+    // }
 }
 
 export const getProductDetails = async (
@@ -24,17 +22,17 @@ export const getProductDetails = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const productId = request.params.productId
-    try {
-        const requestedProduct = await Product.findByPk(productId, { rejectOnEmpty: true })
-        response.render('shop/product-details', {
-            product: requestedProduct,
-            pageTitle: requestedProduct.title,
-            routePath: '/products'
-        })
-    } catch (error) {
-        next(error)
-    }
+    // const productId = request.params.productId
+    // try {
+    //     const requestedProduct = await Product.findByPk(productId, { rejectOnEmpty: true })
+    //     response.render('shop/product-details', {
+    //         product: requestedProduct,
+    //         pageTitle: requestedProduct.title,
+    //         routePath: '/products'
+    //     })
+    // } catch (error) {
+    //     next(error)
+    // }
 }
 
 export const getIndex = async (
@@ -44,7 +42,7 @@ export const getIndex = async (
 ): Promise<void> => {
     try {
         response.render('shop/index', {
-            productList: await Product.findAll(),
+            productList: await db.product.findMany(),
             pageTitle: 'Shop',
             routePath: '/'
         })
@@ -54,12 +52,12 @@ export const getIndex = async (
 }
 
 export const getCart = async (request: Request, response: Response): Promise<void> => {
-    const cart = await Cart.getCart()
-    response.render('shop/cart', {
-        pageTitle: 'Your Cart',
-        routePath: '/cart',
-        cartItems: cart.items
-    })
+    // const cart = await Cart.getCart()
+    // response.render('shop/cart', {
+    //     pageTitle: 'Your Cart',
+    //     routePath: '/cart',
+    //     cartItems: cart.items
+    // })
 }
 
 export const postCart = async (request: Request, response: Response): Promise<void> => {

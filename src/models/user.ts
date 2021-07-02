@@ -1,28 +1,28 @@
-import {
-    Model,
-    Column,
-    Table,
-    BelongsToMany,
-    Scopes,
-    CreatedAt,
-    UpdatedAt,
-    DataType,
-    HasMany
-} from 'sequelize-typescript'
-import { Product } from './product'
+// import {
+//     Model,
+//     Column,
+//     Table,
+//     BelongsToMany,
+//     Scopes,
+//     CreatedAt,
+//     UpdatedAt,
+//     DataType,
+//     HasMany
+// } from 'sequelize-typescript'
+// import { Product } from './product'
 
-@Table
-export class User extends Model {
-    @Column({ primaryKey: true })
-    id!: string
+// @Table
+// export class User extends Model {
+//     @Column({ primaryKey: true })
+//     id!: string
 
-    @Column
-    name!: string
+//     @Column
+//     name!: string
 
-    @Column
-    email!: string
+//     @Column
+//     email!: string
 
-    @Column
-    @HasMany(() => Product)
-    createdProducts?: Product[]
-}
+//     @Column
+//     @HasMany(() => Product)
+//     createdProducts?: Product[]
+// }

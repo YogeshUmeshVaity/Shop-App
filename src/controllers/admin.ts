@@ -2,11 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
 const db = new PrismaClient()
 
-// UUID generator: https://github.com/uuidjs/uuid
-// type definitions can be installed using: npm install --save @types/uuid
-// To get random values every time, don't specify any options while calling uuid() function.
-import { v4 as uuid } from 'uuid'
-
 export const getAddProduct = (request: Request, response: Response): void => {
     return response.render('admin/edit-product', {
         pageTitle: 'Add Product',
@@ -23,7 +18,6 @@ export const postAddProduct = async (
     try {
         await db.product.create({
             data: {
-                id: uuid(),
                 ...request.body,
                 price: parseFloat(request.body.price),
                 createdByUserId: request.user?.id
@@ -40,21 +34,21 @@ export const getEditProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // const productId = request.params.productId
-    // try {
-    //     const productToEdit = await Product.findByPk(productId)
-    //     if (!productToEdit) {
-    //         response.redirect('/')
-    //     }
-    //     response.render('admin/edit-product', {
-    //         pageTitle: 'Edit Product',
-    //         routePath: '/admin/edit-product',
-    //         isEditingMode: true,
-    //         productToEdit: productToEdit
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    const productId = request.params.productId
+    try {
+        const productToEdit = await db.product.findUnique({ where: { id: productId } })
+        if (!productToEdit) {
+            response.redirect('/')
+        }
+        response.render('admin/edit-product', {
+            pageTitle: 'Edit Product',
+            routePath: '/admin/edit-product',
+            isEditingMode: true,
+            productToEdit: productToEdit
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postEditProduct = async (
@@ -62,21 +56,21 @@ export const postEditProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     const result = await Product.update(
-    //         {
-    //             title: request.body.title,
-    //             imageUrl: request.body.imageUrl,
-    //             description: request.body.description,
-    //             price: request.body.price
-    //         },
-    //         { where: { id: request.body.productId } }
-    //     )
-    //     // TODO: handleResult(result)
-    //     return response.redirect('/admin/products')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const result = await db.product.update({
+            where: { id: request.body.productId },
+            data: {
+                title: request.body.title,
+                imageUrl: request.body.imageUrl,
+                description: request.body.description,
+                price: parseFloat(request.body.price)
+            }
+        })
+        // TODO: handleResult(result)
+        return response.redirect('/admin/products')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getProducts = async (
@@ -84,15 +78,15 @@ export const getProducts = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     response.render('admin/product-list', {
-    //         productList: await Product.findAll(),
-    //         pageTitle: 'Admin Products',
-    //         routePath: '/admin/products'
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        response.render('admin/product-list', {
+            productList: await db.product.findMany(),
+            pageTitle: 'Admin Products',
+            routePath: '/admin/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postDeleteProduct = async (
@@ -100,10 +94,10 @@ export const postDeleteProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     await Product.destroy({ where: { id: request.params.productId } })
-    //     response.redirect('/admin/products')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        await db.product.delete({ where: { id: request.params.productId } })
+        response.redirect('/admin/products')
+    } catch (error) {
+        next(error)
+    }
 }

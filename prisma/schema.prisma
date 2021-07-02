@@ -1,6 +1,14 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Whenever you change schema in this file you need to execute the migrate command, to reflect the
+// changes in the database:
+// npx prisma migrate dev --name init
+
+// Whenever you change schema directly in the database, you need to execute introspect command to
+// reflect the changes here:
+// npx prisma introspect
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -11,7 +19,7 @@ generator client {
 }
 
 model User {
-  id              String    @id
+  id              String    @id @default(uuid())
   name            String
   email           String    @unique
   createdProducts Product[]
@@ -20,7 +28,7 @@ model User {
 }
 
 model Product {
-  id          String  @id
+  id          String  @id @default(uuid())
   title       String
   price       Float
   imageUrl    String

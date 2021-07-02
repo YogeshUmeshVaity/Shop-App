@@ -6,15 +6,15 @@ export const getProducts = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     response.render('shop/product-list', {
-    //         productList: await Product.findAll(),
-    //         pageTitle: 'All Products',
-    //         routePath: '/products'
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        response.render('shop/product-list', {
+            productList: await db.product.findMany(),
+            pageTitle: 'All Products',
+            routePath: '/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getProductDetails = async (
@@ -22,17 +22,20 @@ export const getProductDetails = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // const productId = request.params.productId
-    // try {
-    //     const requestedProduct = await Product.findByPk(productId, { rejectOnEmpty: true })
-    //     response.render('shop/product-details', {
-    //         product: requestedProduct,
-    //         pageTitle: requestedProduct.title,
-    //         routePath: '/products'
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    const productId = request.params.productId
+    try {
+        const requestedProduct = await db.product.findUnique({
+            where: { id: productId },
+            rejectOnNotFound: true
+        })
+        response.render('shop/product-details', {
+            product: requestedProduct,
+            pageTitle: requestedProduct.title,
+            routePath: '/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getIndex = async (
@@ -90,11 +93,4 @@ export const getCheckout = (request: Request, response: Response): void => {
         pageTitle: 'Checkout',
         routePath: '/checkout'
     })
-}
-
-async function testDatabase() {
-    // const result = await database.execute('SELECT * FROM products')
-    // console.log('From database', JSON.parse(JSON.stringify(result[0])))
-    // const allProducts: Array<Product> = JSON.parse(JSON.stringify(result[0]))
-    // allProducts[0].id
 }

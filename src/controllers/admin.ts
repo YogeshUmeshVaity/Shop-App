@@ -36,7 +36,7 @@ export const getEditProduct = async (
 ): Promise<void> => {
     const productId = request.params.productId
     try {
-        const productToEdit = await db.product.findUnique({ where: { id: productId } })
+        const productToEdit = await findProductForUser(productId, request)
         if (!productToEdit) {
             response.redirect('/')
         }
@@ -100,4 +100,26 @@ export const postDeleteProduct = async (
     } catch (error) {
         next(error)
     }
+}
+
+/**
+ * Finds the product only if it matches the currently logged in user.
+ */
+async function findProductForUser(productId: string, request: Request) {
+    return await db.product.findFirst({
+        where: {
+            AND: [
+                {
+                    id: {
+                        equals: productId
+                    }
+                },
+                {
+                    createdByUserId: {
+                        equals: request.user?.id
+                    }
+                }
+            ]
+        }
+    })
 }

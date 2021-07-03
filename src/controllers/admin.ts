@@ -80,7 +80,7 @@ export const getProducts = async (
 ): Promise<void> => {
     try {
         response.render('admin/product-list', {
-            productList: await db.product.findMany(),
+            productList: await productsOfUser(request),
             pageTitle: 'Admin Products',
             routePath: '/admin/products'
         })
@@ -100,6 +100,15 @@ export const postDeleteProduct = async (
     } catch (error) {
         next(error)
     }
+}
+
+/**
+ * Finds all the products created by the currently logged in user.
+ */
+async function productsOfUser(request: Request) {
+    return await db.product.findMany({
+        where: { createdByUserId: request.user?.id }
+    })
 }
 
 /**

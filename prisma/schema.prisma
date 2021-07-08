@@ -18,23 +18,51 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// A user creates many Products. A User has a Cart.
 model User {
   id              String    @id @default(uuid())
   name            String
   email           String    @unique
   createdProducts Product[]
+  cart            Cart?
 
   @@map("user")
 }
 
+// A Product is created by a User. A Product belongs to many CartItems
 model Product {
-  id          String  @id @default(uuid())
-  title       String
-  price       Float
-  imageUrl    String
-  description String? @db.Text
+  id              String     @id @default(uuid())
+  title           String
+  price           Float
+  imageUrl        String
+  description     String?    @db.Text
+  createdByUser   User       @relation(fields: [createdByUserId], references: [id])
+  createdByUserId String // This is a foreign key, also called relation scalar field
+  cartItem        CartItem[]
 
-  createdByUser   User   @relation(fields: [createdByUserId], references: [id])
-  createdByUserId String
   @@map("product")
+}
+
+// A Cart belongs to a User. A Cart has many CartItems.
+model Cart {
+  id        String     @id @default(uuid())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String
+  cartItems CartItem[]
+
+  @@map("cart")
+}
+
+// This table establishes the many-to-many relationship between Product and Cart. That is equal to
+// two one-to-many relationships: A Product belongs to many Carts and A Cart has many Products
+// through CartItem.
+model CartItem {
+  id        String  @id @default(uuid())
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  cartId    String
+
+  @@map("cart_item")
 }

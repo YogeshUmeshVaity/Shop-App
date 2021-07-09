@@ -62,7 +62,7 @@ export const getCart = async (
 ): Promise<void> => {
     const userId = request.user?.id
     try {
-        const cart = await getCartFor(userId)
+        const cart = await getCartWithItems(userId)
         response.render('shop/cart', {
             pageTitle: 'Your Cart',
             routePath: '/cart',
@@ -101,7 +101,10 @@ export const deleteCartItem = async (
     next: NextFunction
 ): Promise<void> => {
     const itemId: string = request.body.itemId
+    const userId = request.user?.id
     try {
+        const cart = await findCartFor(userId)
+        await ensureIfItemIsFromThisUser(itemId, cart)
         await db.cartItem.delete({ where: { id: itemId } })
         response.redirect('/cart')
     } catch (error) {
@@ -120,6 +123,16 @@ export const getCheckout = (request: Request, response: Response): void => {
     response.render('shop/checkout', {
         pageTitle: 'Checkout',
         routePath: '/checkout'
+    })
+}
+
+// Throws error if the cart-item doesn't belong to this user. This is a safety net.
+async function ensureIfItemIsFromThisUser(itemId: string, cart: Cart) {
+    return await db.cartItem.findFirst({
+        where: {
+            AND: [{ id: itemId }, { cartId: cart.id }]
+        },
+        rejectOnNotFound: true
     })
 }
 
@@ -151,7 +164,7 @@ async function findCartFor(userId: string | undefined) {
     })
 }
 
-async function getCartFor(userId: string | undefined) {
+async function getCartWithItems(userId: string | undefined) {
     return await db.cart.findFirst({
         where: { userId: userId },
         include: {

@@ -1,3 +1,4 @@
+import { Cart, CartItem } from '@prisma/client'
 import { NextFunction, Request, Response } from 'express'
 import { db } from '../util/database'
 
@@ -54,25 +55,44 @@ export const getIndex = async (
     }
 }
 
-export const getCart = async (request: Request, response: Response): Promise<void> => {
+export const getCart = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
     const userId = request.user?.id
-    const cart = await getCartFor(userId)
-    response.render('shop/cart', {
-        pageTitle: 'Your Cart',
-        routePath: '/cart',
-        cartItems: cart?.cartItems
-    })
+    try {
+        const cart = await getCartFor(userId)
+        response.render('shop/cart', {
+            pageTitle: 'Your Cart',
+            routePath: '/cart',
+            cartItems: cart?.cartItems
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
-export const postCart = async (request: Request, response: Response): Promise<void> => {
-    // const productId: string = request.body.productId
-    // try {
-    //     const product = await Product.findProduct(productId)
-    //     Cart.addItem(product, product.price)
-    //     response.redirect('/cart')
-    // } catch (err) {
-    //     response.redirect('/404')
-    // }
+export const postCart = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const quantity = 1
+    const productId = request.body.productId
+    const userId = request.user?.id
+    try {
+        const cart = await findCartFor(userId)
+        const existingCartItem = await findExistingItemIn(cart, productId)
+        if (existingCartItem) {
+            await increaseQuantityOf(existingCartItem, quantity)
+        } else {
+            await createNewCartItem(productId, cart, quantity)
+        }
+        response.redirect('/cart')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const deleteCartItem = async (request: Request, response: Response): Promise<void> => {
@@ -93,6 +113,34 @@ export const getCheckout = (request: Request, response: Response): void => {
     response.render('shop/checkout', {
         pageTitle: 'Checkout',
         routePath: '/checkout'
+    })
+}
+
+async function createNewCartItem(productId: string, cart: Cart, addedQuantity: number) {
+    await db.cartItem.create({
+        data: { productId: productId, cartId: cart.id, quantity: addedQuantity }
+    })
+}
+
+async function increaseQuantityOf(existingCartItem: CartItem, addedQuantity: number) {
+    await db.cartItem.update({
+        where: { id: existingCartItem.id },
+        data: { quantity: existingCartItem.quantity + addedQuantity }
+    })
+}
+
+async function findExistingItemIn(cart: Cart, productId: string) {
+    return await db.cartItem.findFirst({
+        where: {
+            AND: [{ cartId: cart.id }, { productId: productId }]
+        }
+    })
+}
+
+async function findCartFor(userId: string | undefined) {
+    return await db.cart.findFirst({
+        where: { userId: userId },
+        rejectOnNotFound: true
     })
 }
 

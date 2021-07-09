@@ -55,12 +55,13 @@ export const getIndex = async (
 }
 
 export const getCart = async (request: Request, response: Response): Promise<void> => {
-    // const cart = await Cart.getCart()
-    // response.render('shop/cart', {
-    //     pageTitle: 'Your Cart',
-    //     routePath: '/cart',
-    //     cartItems: cart.items
-    // })
+    const userId = request.user?.id
+    const cart = await getCartFor(userId)
+    response.render('shop/cart', {
+        pageTitle: 'Your Cart',
+        routePath: '/cart',
+        cartItems: cart?.cartItems
+    })
 }
 
 export const postCart = async (request: Request, response: Response): Promise<void> => {
@@ -92,5 +93,18 @@ export const getCheckout = (request: Request, response: Response): void => {
     response.render('shop/checkout', {
         pageTitle: 'Checkout',
         routePath: '/checkout'
+    })
+}
+
+async function getCartFor(userId: string | undefined) {
+    return await db.cart.findFirst({
+        where: { userId: userId },
+        include: {
+            cartItems: {
+                include: {
+                    product: true
+                }
+            }
+        }
     })
 }

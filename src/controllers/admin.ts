@@ -1,6 +1,22 @@
 import { NextFunction, Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
+import { User } from '.prisma/client'
 const db = new PrismaClient()
+
+export const createTestUser = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        let user = await db.user.findUnique({ where: { id: '1' } })
+        user = await createIfDoesntExist(user)
+        request.user = user
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
 
 export const getAddProduct = (request: Request, response: Response): void => {
     return response.render('admin/edit-product', {
@@ -129,6 +145,35 @@ async function findProductForUser(productId: string, request: Request) {
                     }
                 }
             ]
+        }
+    })
+}
+
+async function createIfDoesntExist(user: User | null) {
+    if (user == null) {
+        console.log('User test', user)
+        user = await createUser()
+        await createCartFor(user)
+    }
+    return user
+}
+
+// TODO: make sure the cart is pre-created for the user, otherwise an undefined is passed to the
+// cart.ejs view. Do this whenever new a user signs up.
+async function createCartFor(user: User) {
+    await db.cart.create({
+        data: {
+            userId: user.id
+        }
+    })
+}
+
+async function createUser(): Promise<User> {
+    return await db.user.create({
+        data: {
+            id: '1',
+            name: 'John',
+            email: 'john@test.com'
         }
     })
 }

@@ -18,27 +18,30 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// A user creates many Products. A User has a Cart.
+// A user creates many Products. A User has a Cart. A User has many Orders.
 model User {
   id              String    @id @default(uuid())
   name            String
   email           String    @unique
   createdProducts Product[]
   cart            Cart?
+  orders          Order[]
 
   @@map("user")
 }
 
-// A Product is created by a User. A Product belongs to many CartItems
+// A Product is created by a User. A Product belongs to many CartItems. A Product belongs to many
+// OrderItems.
 model Product {
-  id              String     @id @default(uuid())
+  id              String      @id @default(uuid())
   title           String
   price           Float
   imageUrl        String
-  description     String?    @db.Text
-  createdByUser   User       @relation(fields: [createdByUserId], references: [id])
+  description     String?     @db.Text
+  createdByUser   User        @relation(fields: [createdByUserId], references: [id])
   createdByUserId String // This is a foreign key, also called relation scalar field
-  cartItem        CartItem[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
 
   @@map("product")
 }
@@ -65,4 +68,29 @@ model CartItem {
   cartId    String
 
   @@map("cart_item")
+}
+
+// An Order belongs to a User. An Order has many OrderItems.
+model Order {
+  id         String      @id @default(uuid())
+  User       User        @relation(fields: [userId], references: [id])
+  userId     String
+  orderItems OrderItem[]
+
+  @@map("order")
+}
+
+// This model is similar to the CartItem.
+// It establishes the many-to-many relationship between Product and Order. That is equal to
+// two one-to-many relationships: A Product belongs to many Orders and An Order has many Products
+// through OrderItem.
+model OrderItem {
+  id        String   @id @default(uuid())
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+  quantity  Int
+  Order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
+
+  @@map("order_item")
 }

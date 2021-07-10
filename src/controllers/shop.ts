@@ -112,6 +112,48 @@ export const deleteCartItem = async (
     }
 }
 
+export const postOrder = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const userId = request.user?.id
+    try {
+        if (!userId) {
+            throw Error('User ID is undefined.')
+        }
+
+        const cart = await db.cart.findFirst({
+            where: {
+                userId: userId
+            },
+            rejectOnNotFound: true,
+            include: {
+                cartItems: true
+            }
+        })
+
+        const order = await db.order.create({
+            data: {
+                userId: userId
+            }
+        })
+
+        cart.cartItems.forEach(async (cartItem) => {
+            await db.orderItem.create({
+                data: {
+                    productId: cartItem.productId,
+                    quantity: cartItem.quantity,
+                    orderId: order.id
+                }
+            })
+        })
+        response.redirect('/orders')
+    } catch (error) {
+        next(error)
+    }
+}
+
 export const getOrders = (request: Request, response: Response): void => {
     response.render('shop/orders', {
         pageTitle: 'Your Orders',

@@ -1,4 +1,4 @@
-import { Cart, CartItem } from '@prisma/client'
+import { Cart, CartItem, Order, Product } from '@prisma/client'
 import { NextFunction, Request, Response } from 'express'
 import { db } from '../util/database'
 
@@ -60,8 +60,8 @@ export const getCart = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const userId = request.user?.id
     try {
+        const userId = getUserIdFrom(request)
         const cart = await getCartWithItems(userId)
         response.render('shop/cart', {
             pageTitle: 'Your Cart',
@@ -80,8 +80,8 @@ export const postCart = async (
 ): Promise<void> => {
     const quantity = 1
     const productId = request.body.productId
-    const userId = request.user?.id
     try {
+        const userId = getUserIdFrom(request)
         const cart = await findCartFor(userId)
         const existingCartItem = await findExistingItemIn(cart, productId)
         if (existingCartItem) {
@@ -101,8 +101,8 @@ export const deleteCartItem = async (
     next: NextFunction
 ): Promise<void> => {
     const itemId: string = request.body.itemId
-    const userId = request.user?.id
     try {
+        const userId = getUserIdFrom(request)
         const cart = await findCartFor(userId)
         await ensureIfItemIsFromThisUser(itemId, cart)
         await db.cartItem.delete({ where: { id: itemId } })
@@ -117,37 +117,11 @@ export const postOrder = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const userId = request.user?.id
     try {
-        if (!userId) {
-            throw Error('User ID is undefined.')
-        }
-
-        const cart = await db.cart.findFirst({
-            where: {
-                userId: userId
-            },
-            rejectOnNotFound: true,
-            include: {
-                cartItems: true
-            }
-        })
-
-        const order = await db.order.create({
-            data: {
-                userId: userId
-            }
-        })
-
-        cart.cartItems.forEach(async (cartItem) => {
-            await db.orderItem.create({
-                data: {
-                    productId: cartItem.productId,
-                    quantity: cartItem.quantity,
-                    orderId: order.id
-                }
-            })
-        })
+        const userId = getUserIdFrom(request)
+        const cart = await getCartWithItems(userId)
+        const newOrder = await createNewOrder(userId)
+        moveCartItemsToNewOrder(cart, newOrder)
         await clearTheCart(cart.id)
         response.redirect('/orders')
     } catch (error) {
@@ -161,7 +135,7 @@ export const getOrders = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const userId = getUserId(request)
+        const userId = getUserIdFrom(request)
         const orders = await getOrdersFor(userId)
         response.render('shop/orders', {
             pageTitle: 'Your Orders',
@@ -180,7 +154,33 @@ export const getCheckout = (request: Request, response: Response): void => {
     })
 }
 
-function getUserId(request: Request): string {
+type CartWithItems = Cart & {
+    cartItems: (CartItem & {
+        product: Product
+    })[]
+}
+
+function moveCartItemsToNewOrder(cart: CartWithItems, newOrder: Order) {
+    cart.cartItems.forEach(async (cartItem) => {
+        await db.orderItem.create({
+            data: {
+                productId: cartItem.productId,
+                quantity: cartItem.quantity,
+                orderId: newOrder.id
+            }
+        })
+    })
+}
+
+async function createNewOrder(userId: string) {
+    return await db.order.create({
+        data: {
+            userId: userId
+        }
+    })
+}
+
+function getUserIdFrom(request: Request): string {
     const userId = request.user?.id
     if (!userId) throw Error('User ID is undefined.')
     return userId
@@ -236,14 +236,14 @@ async function findExistingItemIn(cart: Cart, productId: string) {
     })
 }
 
-async function findCartFor(userId: string | undefined) {
+async function findCartFor(userId: string) {
     return await db.cart.findFirst({
         where: { userId: userId },
         rejectOnNotFound: true
     })
 }
 
-async function getCartWithItems(userId: string | undefined) {
+async function getCartWithItems(userId: string) {
     return await db.cart.findFirst({
         where: { userId: userId },
         include: {
@@ -252,6 +252,7 @@ async function getCartWithItems(userId: string | undefined) {
                     product: true
                 }
             }
-        }
+        },
+        rejectOnNotFound: true
     })
 }

@@ -148,6 +148,7 @@ export const postOrder = async (
                 }
             })
         })
+        await clearTheCart(cart.id)
         response.redirect('/orders')
     } catch (error) {
         next(error)
@@ -166,6 +167,10 @@ export const getCheckout = (request: Request, response: Response): void => {
         pageTitle: 'Checkout',
         routePath: '/checkout'
     })
+}
+
+async function clearTheCart(cartId: string) {
+    await db.cartItem.deleteMany({ where: { cartId: cartId } })
 }
 
 // Throws error if the cart-item doesn't belong to this user. This is a safety net.

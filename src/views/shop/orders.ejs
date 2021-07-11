@@ -4,6 +4,22 @@
     <body>
         <%- include('../includes/navigation.ejs') %>
         <main>
+            <% if (orders.length <= 0) { %>
+                <h1>There are no orders!</h1>
+            <% } else { %>
+                <ul>
+                    <% orders.forEach(order => { %>
+                        <li>
+                            <h1>Order ID: <%= order.id %> </h1>
+                            <ul>
+                                <% order.orderItems.forEach(item => { %>
+                                    <li><%= item.product.title %> (<%= item.quantity %> )</li>
+                                <% }) %> 
+                            </ul>
+                        </li>
+                    <% }) %> 
+                </ul>
+            <% } %> 
             <h1>Orders page not implemented yet</h1>
         </main>
         <%- include('../includes/end.ejs') %>

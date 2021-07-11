@@ -155,17 +155,49 @@ export const postOrder = async (
     }
 }
 
-export const getOrders = (request: Request, response: Response): void => {
-    response.render('shop/orders', {
-        pageTitle: 'Your Orders',
-        routePath: '/orders'
-    })
+export const getOrders = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const userId = getUserId(request)
+        const orders = await getOrdersFor(userId)
+        response.render('shop/orders', {
+            pageTitle: 'Your Orders',
+            routePath: '/orders',
+            orders: orders
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getCheckout = (request: Request, response: Response): void => {
     response.render('shop/checkout', {
         pageTitle: 'Checkout',
         routePath: '/checkout'
+    })
+}
+
+function getUserId(request: Request): string {
+    const userId = request.user?.id
+    if (!userId) throw Error('User ID is undefined.')
+    return userId
+}
+
+async function getOrdersFor(userId: string) {
+    return await db.order.findMany({
+        where: {
+            userId: userId
+        },
+        include: {
+            orderItems: {
+                include: {
+                    product: true
+                }
+            }
+        }
     })
 }
 

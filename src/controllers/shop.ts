@@ -1,5 +1,5 @@
-import { Cart, CartItem, Order, Product } from '@prisma/client'
 import { NextFunction, Request, Response } from 'express'
+import { Product } from '../models/Product'
 
 export const getProducts = async (
     request: Request,
@@ -43,15 +43,15 @@ export const getIndex = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     response.render('shop/index', {
-    //         productList: await db.product.findMany(),
-    //         pageTitle: 'Shop',
-    //         routePath: '/'
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        response.render('shop/index', {
+            productList: await Product.findAll(),
+            pageTitle: 'Shop',
+            routePath: '/'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getCart = async (
@@ -151,12 +151,6 @@ export const getCheckout = (request: Request, response: Response): void => {
         pageTitle: 'Checkout',
         routePath: '/checkout'
     })
-}
-
-type CartWithItems = Cart & {
-    cartItems: (CartItem & {
-        product: Product
-    })[]
 }
 
 // function moveCartItemsToNewOrder(cart: CartWithItems, newOrder: Order) {

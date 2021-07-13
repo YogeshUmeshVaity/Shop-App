@@ -21,4 +21,9 @@ export class Product {
             throw error
         }
     }
+
+    static async findAll(): Promise<Product[]> {
+        const products: Product[] = await db().collection('products').find().toArray()
+        return products
+    }
 }

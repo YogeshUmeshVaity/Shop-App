@@ -2,9 +2,9 @@ import mongodb from 'mongodb'
 
 const MongoClient = mongodb.MongoClient
 
-export const mongoConnect = async (
-    callback: (arg0: mongodb.MongoClient) => void
-): Promise<void> => {
+export let _db: mongodb.Db
+
+export const connectMongoDb = async (callback: () => void): Promise<void> => {
     try {
         const databaseUrl = process.env.DATABASE_URL
         if (!databaseUrl) throw Error('Database URL is undefined.')
@@ -12,8 +12,15 @@ export const mongoConnect = async (
             useNewUrlParser: true,
             useUnifiedTopology: true
         })
-        callback(client)
+        _db = client.db()
+        callback()
     } catch (error) {
         console.log(error)
+        throw error
     }
+}
+
+export const database = (): mongodb.Db => {
+    if (!_db) throw Error('No database found!')
+    return _db
 }

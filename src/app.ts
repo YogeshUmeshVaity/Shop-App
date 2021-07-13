@@ -3,7 +3,7 @@ import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import path from 'path'
 import dotenv from 'dotenv'
-import { mongoConnect } from './util/database'
+import { connectMongoDb } from './util/database'
 
 // Controllers
 import * as errorController from './controllers/error'
@@ -31,7 +31,6 @@ app.use('/', shopRoutes)
 
 app.use(errorController.get404)
 
-mongoConnect((client) => {
-    console.log(client)
+connectMongoDb(() => {
     app.listen(3000)
 })

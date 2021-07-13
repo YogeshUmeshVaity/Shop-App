@@ -1,21 +1,19 @@
 import { NextFunction, Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
-import { User } from '.prisma/client'
-const db = new PrismaClient()
+import { Product } from '../models/Product'
 
 export const createTestUser = async (
     request: Request,
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    try {
-        let user = await db.user.findUnique({ where: { id: '1' } })
-        user = await createIfDoesntExist(user)
-        request.user = user
-        next()
-    } catch (error) {
-        next(error)
-    }
+    // try {
+    //     let user = await db.user.findUnique({ where: { id: '1' } })
+    //     user = await createIfDoesntExist(user)
+    //     request.user = user
+    //     next()
+    // } catch (error) {
+    //     next(error)
+    // }
 }
 
 export const getAddProduct = (request: Request, response: Response): void => {
@@ -32,148 +30,148 @@ export const postAddProduct = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        await db.product.create({
-            data: {
-                ...request.body,
-                price: parseFloat(request.body.price),
-                createdByUserId: request.user?.id
-            }
-        })
+        const newProduct = new Product(
+            request.body.title,
+            request.body.price,
+            request.body.description,
+            request.body.imageUrl
+        )
+        await newProduct.save()
         response.redirect('/')
     } catch (error) {
         next(error)
     }
 }
 
-export const getEditProduct = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-): Promise<void> => {
-    const productId = request.params.productId
-    try {
-        const productToEdit = await findProductForUser(productId, request)
-        if (!productToEdit) {
-            response.redirect('/')
-        }
-        response.render('admin/edit-product', {
-            pageTitle: 'Edit Product',
-            routePath: '/admin/edit-product',
-            isEditingMode: true,
-            productToEdit: productToEdit
-        })
-    } catch (error) {
-        next(error)
-    }
-}
+// export const getEditProduct = async (
+//     request: Request,
+//     response: Response,
+//     next: NextFunction
+// ): Promise<void> => {
+//     const productId = request.params.productId
+//     try {
+//         const productToEdit = await findProductForUser(productId, request)
+//         if (!productToEdit) {
+//             response.redirect('/')
+//         }
+//         response.render('admin/edit-product', {
+//             pageTitle: 'Edit Product',
+//             routePath: '/admin/edit-product',
+//             isEditingMode: true,
+//             productToEdit: productToEdit
+//         })
+//     } catch (error) {
+//         next(error)
+//     }
+// }
 
-export const postEditProduct = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-): Promise<void> => {
-    try {
-        const result = await db.product.update({
-            where: { id: request.body.productId },
-            data: {
-                title: request.body.title,
-                imageUrl: request.body.imageUrl,
-                description: request.body.description,
-                price: parseFloat(request.body.price)
-            }
-        })
-        // TODO: handleResult(result)
-        return response.redirect('/admin/products')
-    } catch (error) {
-        next(error)
-    }
-}
+// export const postEditProduct = async (
+//     request: Request,
+//     response: Response,
+//     next: NextFunction
+// ): Promise<void> => {
+//     try {
+//         const result = await db.product.update({
+//             where: { id: request.body.productId },
+//             data: {
+//                 title: request.body.title,
+//                 imageUrl: request.body.imageUrl,
+//                 description: request.body.description,
+//                 price: parseFloat(request.body.price)
+//             }
+//         })
+//         // TODO: handleResult(result)
+//         return response.redirect('/admin/products')
+//     } catch (error) {
+//         next(error)
+//     }
+// }
 
-export const getProducts = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-): Promise<void> => {
-    try {
-        response.render('admin/product-list', {
-            productList: await productsOfUser(request),
-            pageTitle: 'Admin Products',
-            routePath: '/admin/products'
-        })
-    } catch (error) {
-        next(error)
-    }
-}
+// export const getProducts = async (
+//     request: Request,
+//     response: Response,
+//     next: NextFunction
+// ): Promise<void> => {
+//     try {
+//         response.render('admin/product-list', {
+//             productList: await productsOfUser(request),
+//             pageTitle: 'Admin Products',
+//             routePath: '/admin/products'
+//         })
+//     } catch (error) {
+//         next(error)
+//     }
+// }
 
-export const postDeleteProduct = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-): Promise<void> => {
-    try {
-        await db.product.delete({ where: { id: request.params.productId } })
-        response.redirect('/admin/products')
-    } catch (error) {
-        next(error)
-    }
-}
+// export const postDeleteProduct = async (
+//     request: Request,
+//     response: Response,
+//     next: NextFunction
+// ): Promise<void> => {
+//     try {
+//         await db.product.delete({ where: { id: request.params.productId } })
+//         response.redirect('/admin/products')
+//     } catch (error) {
+//         next(error)
+//     }
+// }
 
-/**
- * Finds all the products created by the currently logged in user.
- */
-async function productsOfUser(request: Request) {
-    return await db.product.findMany({
-        where: { createdByUserId: request.user?.id }
-    })
-}
+// /**
+//  * Finds all the products created by the currently logged in user.
+//  */
+// async function productsOfUser(request: Request) {
+//     return await db.product.findMany({
+//         where: { createdByUserId: request.user?.id }
+//     })
+// }
 
-/**
- * Finds the product only if it matches the currently logged in user.
- */
-async function findProductForUser(productId: string, request: Request) {
-    return await db.product.findFirst({
-        where: {
-            AND: [
-                {
-                    id: {
-                        equals: productId
-                    }
-                },
-                {
-                    createdByUserId: {
-                        equals: request.user?.id
-                    }
-                }
-            ]
-        }
-    })
-}
+// /**
+//  * Finds the product only if it matches the currently logged in user.
+//  */
+// async function findProductForUser(productId: string, request: Request) {
+//     return await db.product.findFirst({
+//         where: {
+//             AND: [
+//                 {
+//                     id: {
+//                         equals: productId
+//                     }
+//                 },
+//                 {
+//                     createdByUserId: {
+//                         equals: request.user?.id
+//                     }
+//                 }
+//             ]
+//         }
+//     })
+// }
 
-async function createIfDoesntExist(user: User | null) {
-    if (user == null) {
-        console.log('User test', user)
-        user = await createUser()
-        await createCartFor(user)
-    }
-    return user
-}
+// async function createIfDoesntExist(user: User | null) {
+//     if (user == null) {
+//         console.log('User test', user)
+//         user = await createUser()
+//         await createCartFor(user)
+//     }
+//     return user
+// }
 
-// TODO: make sure the cart is pre-created for the user, otherwise an undefined is passed to the
-// cart.ejs view. Do this whenever new a user signs up.
-async function createCartFor(user: User) {
-    await db.cart.create({
-        data: {
-            userId: user.id
-        }
-    })
-}
+// // TODO: make sure the cart is pre-created for the user, otherwise an undefined is passed to the
+// // cart.ejs view. Do this whenever new a user signs up.
+// async function createCartFor(user: User) {
+//     await db.cart.create({
+//         data: {
+//             userId: user.id
+//         }
+//     })
+// }
 
-async function createUser(): Promise<User> {
-    return await db.user.create({
-        data: {
-            id: '1',
-            name: 'John',
-            email: 'john@test.com'
-        }
-    })
-}
+// async function createUser(): Promise<User> {
+//     return await db.user.create({
+//         data: {
+//             id: '1',
+//             name: 'John',
+//             email: 'john@test.com'
+//         }
+//     })
+// }

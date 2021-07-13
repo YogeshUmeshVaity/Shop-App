@@ -2,12 +2,16 @@ import express from 'express'
 import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import path from 'path'
+import dotenv from 'dotenv'
+import { mongoConnect } from './util/database'
 
 // Controllers
 import * as errorController from './controllers/error'
-import { createTestUser } from './controllers/admin'
 
 const app = express()
+
+// Load environment variables from a .env file
+dotenv.config()
 
 // Set the rendering engine to be used.
 app.set('view engine', 'ejs')
@@ -17,7 +21,7 @@ app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.urlencoded({ extended: false }))
 
-app.use(createTestUser)
+// app.use(createTestUser)
 
 // Used for serving public static files.
 app.use(express.static(path.join(__dirname, 'public')))
@@ -27,4 +31,7 @@ app.use('/', shopRoutes)
 
 app.use(errorController.get404)
 
-app.listen(3000)
+mongoConnect((client) => {
+    console.log(client)
+    app.listen(3000)
+})

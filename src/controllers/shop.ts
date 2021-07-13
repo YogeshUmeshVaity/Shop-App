@@ -6,15 +6,15 @@ export const getProducts = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     response.render('shop/product-list', {
-    //         productList: await db.product.findMany(),
-    //         pageTitle: 'All Products',
-    //         routePath: '/products'
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        response.render('shop/product-list', {
+            productList: await Product.findAll(),
+            pageTitle: 'All Products',
+            routePath: '/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getProductDetails = async (

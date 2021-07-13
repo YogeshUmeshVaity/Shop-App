@@ -23,19 +23,16 @@ export const getProductDetails = async (
     next: NextFunction
 ): Promise<void> => {
     const productId = request.params.productId
-    // try {
-    //     const requestedProduct = await db.product.findUnique({
-    //         where: { id: productId },
-    //         rejectOnNotFound: true
-    //     })
-    //     response.render('shop/product-details', {
-    //         product: requestedProduct,
-    //         pageTitle: requestedProduct.title,
-    //         routePath: '/products'
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const requestedProduct = await Product.findById(productId)
+        response.render('shop/product-details', {
+            product: requestedProduct,
+            pageTitle: requestedProduct.title,
+            routePath: '/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getIndex = async (

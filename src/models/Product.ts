@@ -1,4 +1,5 @@
 import { database as db } from '../util/database'
+import mongodb from 'mongodb'
 
 export class Product {
     title: string
@@ -25,5 +26,12 @@ export class Product {
     static async findAll(): Promise<Product[]> {
         const products: Product[] = await db().collection('products').find().toArray()
         return products
+    }
+
+    static async findById(id: string): Promise<Product> {
+        return await db()
+            .collection('products')
+            .find({ _id: new mongodb.ObjectId(id) })
+            .next()
     }
 }

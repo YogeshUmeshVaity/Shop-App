@@ -106,12 +106,12 @@ export const postDeleteProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     await db.product.delete({ where: { id: request.params.productId } })
-    //     response.redirect('/admin/products')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        await Product.deleteById(request.params.productId)
+        response.redirect('/admin/products')
+    } catch (error) {
+        next(error)
+    }
 }
 
 // /**

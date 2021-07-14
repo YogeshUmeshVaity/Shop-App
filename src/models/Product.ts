@@ -56,4 +56,10 @@ export class Product {
                 }
             )
     }
+
+    static async deleteById(id: string): Promise<void> {
+        await db()
+            .collection('products')
+            .deleteOne({ _id: new mongodb.ObjectID(id) })
+    }
 }

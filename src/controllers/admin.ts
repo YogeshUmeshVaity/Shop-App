@@ -49,20 +49,20 @@ export const getEditProduct = async (
     next: NextFunction
 ): Promise<void> => {
     const productId = request.params.productId
-    // try {
-    //     const productToEdit = await findProductForUser(productId, request)
-    //     if (!productToEdit) {
-    //         response.redirect('/')
-    //     }
-    //     response.render('admin/edit-product', {
-    //         pageTitle: 'Edit Product',
-    //         routePath: '/admin/edit-product',
-    //         isEditingMode: true,
-    //         productToEdit: productToEdit
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const productToEdit = await Product.findById(productId)
+        if (!productToEdit) {
+            response.redirect('/')
+        }
+        response.render('admin/edit-product', {
+            pageTitle: 'Edit Product',
+            routePath: '/admin/edit-product',
+            isEditingMode: true,
+            productToEdit: productToEdit
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postEditProduct = async (

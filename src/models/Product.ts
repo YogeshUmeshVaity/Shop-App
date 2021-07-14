@@ -34,4 +34,26 @@ export class Product {
             .find({ _id: new mongodb.ObjectId(id) })
             .next()
     }
+
+    static async update(
+        id: string,
+        title: string,
+        price: number,
+        description: string,
+        imageUrl: string
+    ): Promise<void> {
+        await db()
+            .collection('products')
+            .updateOne(
+                { _id: new mongodb.ObjectID(id) },
+                {
+                    $set: {
+                        title: title,
+                        price: price,
+                        description: description,
+                        imageUrl: imageUrl
+                    }
+                }
+            )
+    }
 }

@@ -70,21 +70,19 @@ export const postEditProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     const result = await db.product.update({
-    //         where: { id: request.body.productId },
-    //         data: {
-    //             title: request.body.title,
-    //             imageUrl: request.body.imageUrl,
-    //             description: request.body.description,
-    //             price: parseFloat(request.body.price)
-    //         }
-    //     })
-    //     // TODO: handleResult(result)
-    //     return response.redirect('/admin/products')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const result = await Product.update(
+            request.body.productId,
+            request.body.title,
+            request.body.imageUrl,
+            request.body.description,
+            request.body.price
+        )
+        // TODO: handleResult(result)
+        return response.redirect('/admin/products')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getProducts = async (

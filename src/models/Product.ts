@@ -2,17 +2,13 @@ import { database as db } from '../util/database'
 import mongodb from 'mongodb'
 
 export class Product {
-    title: string
-    price: number
-    description: string
-    imageUrl: string
-
-    constructor(title: string, price: number, description: string, imageUrl: string) {
-        this.title = title
-        this.price = price
-        this.description = description
-        this.imageUrl = imageUrl
-    }
+    constructor(
+        public title: string,
+        public price: number,
+        public description: string,
+        public imageUrl: string,
+        public userId: string
+    ) {}
 
     async save(): Promise<void> {
         try {

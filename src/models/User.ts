@@ -1,14 +1,8 @@
-import { connectMongoDb, database as db } from '../util/database'
+import { database as db } from '../util/database'
 import mongodb from 'mongodb'
 
 export class User {
-    name: string
-    email: string
-
-    constructor(name: string, email: string) {
-        this.name = name
-        this.email = email
-    }
+    constructor(public name: string, public email: string) {}
 
     async save(): Promise<void> {
         await db().collection('users').insertOne(this)

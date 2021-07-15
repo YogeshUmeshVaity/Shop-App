@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import { User } from '../models/User'
 
 /**
  * Augments existing definition of Request in Express.

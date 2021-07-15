@@ -1,19 +1,20 @@
 import { NextFunction, Request, Response } from 'express'
 import { Product } from '../models/Product'
+import { User } from '../models/User'
 
 export const createTestUser = async (
     request: Request,
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     let user = await db.user.findUnique({ where: { id: '1' } })
-    //     user = await createIfDoesntExist(user)
-    //     request.user = user
-    //     next()
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        // This user should be manually created directly in the database.
+        request.user = await User.findById('60f02a0419a7eaf596a820ee')
+        console.log('Current user: ', request.user)
+        next()
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getAddProduct = (request: Request, response: Response): void => {

@@ -56,4 +56,15 @@ export class User {
         console.log({ items: [...cartItems], totalPrice: 0 })
         return { items: [...cartItems], totalPrice: 0 }
     }
+
+    static async deleteCartItem(productId: string, user: User): Promise<void> {
+        console.log('Inside deleteCartItem() controller')
+        const result = await db()
+            .collection('users')
+            .updateOne(
+                { _id: new mongodb.ObjectId(user._id) },
+                { $pull: { 'cart.items': { productId: new mongodb.ObjectId(productId) } } }
+            )
+        console.log('Delete result', result)
+    }
 }

@@ -90,16 +90,19 @@ export const deleteCartItem = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const itemId: string = request.body.itemId
-    // try {
-    //     const userId = getUserIdFrom(request)
-    //     const cart = await findCartFor(userId)
-    //     await ensureIfItemIsFromThisUser(itemId, cart)
-    //     await db.cartItem.delete({ where: { id: itemId } })
-    //     response.redirect('/cart')
-    // } catch (error) {
-    //     next(error)
-    // }
+    const productId: string = request.body.itemId
+    console.log('Product to delete ID', productId)
+    
+    try {
+        // const userId = getUserIdFrom(request)
+        // const cart = await findCartFor(userId)
+        // await ensureIfItemIsFromThisUser(itemId, cart)
+        // await db.cartItem.delete({ where: { id: itemId } })
+        await User.deleteCartItem(productId, request.user)
+        response.redirect('/cart')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postOrder = async (

@@ -11,9 +11,9 @@ export class Product {
         public userId: string
     ) {}
 
-    async save(): Promise<void> {
+    static async save(newProduct: Product): Promise<void> {
         try {
-            await db().collection('products').insertOne(this)
+            await db().collection('products').insertOne(newProduct)
         } catch (error) {
             console.log(error)
             throw error

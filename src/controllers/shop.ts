@@ -58,10 +58,11 @@ export const getCart = async (
     next: NextFunction
 ): Promise<void> => {
     try {
+        const cart = await User.getCart(request.user)
         response.render('shop/cart', {
             pageTitle: 'Your Cart',
             routePath: '/cart',
-            cartItems: request.user.cart.items
+            cartItems: cart.items
         })
     } catch (error) {
         next(error)
@@ -82,19 +83,6 @@ export const postCart = async (
     } catch (error) {
         next(error)
     }
-    // try {
-    //     const userId = getUserIdFrom(request)
-    //     const cart = await findCartFor(userId)
-    //     const existingCartItem = await findExistingItemIn(cart, productId)
-    //     if (existingCartItem) {
-    //         await increaseQuantityOf(existingCartItem, quantity)
-    //     } else {
-    //         await createNewCartItem(productId, cart, quantity)
-    //     }
-    //     response.redirect('/cart')
-    // } catch (error) {
-    //     next(error)
-    // }
 }
 
 export const deleteCartItem = async (

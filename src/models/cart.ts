@@ -5,13 +5,22 @@ import { Product } from './Product'
 
 // TODO: Use the inc operator of mongodb to increase the quantity.
 export interface CartItem {
-    product: Product
+    productId: string
     quantity: number
 }
 
 // TODO: Use the push operator of mongodb array to push a CartItem.
 export class Cart {
     items: Array<CartItem> = []
+    totalPrice = 0
+}
+
+export interface CartItemWithProduct {
+    product: Product
+    quantity: number
+}
+export class CartWithProducts {
+    items: Array<CartItemWithProduct> = []
     totalPrice = 0
 }
 

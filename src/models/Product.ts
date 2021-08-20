@@ -2,6 +2,7 @@ import { database as db } from '../util/database'
 import mongodb from 'mongodb'
 
 export class Product {
+    _id!: string
     constructor(
         public title: string,
         public price: number,

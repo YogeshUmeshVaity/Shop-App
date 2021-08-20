@@ -1,17 +1,19 @@
 // import path from 'path'
 // import { rootDirectory } from '../util/path'
 // import { promises as fs } from 'fs'
-// import { Product } from './product'
+import { Product } from './Product'
 
-// interface CartItem {
-//     product: Product
-//     quantity: number
-// }
+// TODO: Use the inc operator of mongodb to increase the quantity.
+export interface CartItem {
+    product: Product
+    quantity: number
+}
 
-// export class Cart {
-//     items: Array<CartItem> = []
-//     totalPrice = 0
-// }
+// TODO: Use the push operator of mongodb array to push a CartItem.
+export class Cart {
+    items: Array<CartItem> = []
+    totalPrice = 0
+}
 
 // export async function addItem(newProduct: Product, price: number): Promise<void> {
 //     const cart = await getCartFromFile()

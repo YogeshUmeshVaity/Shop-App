@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { Product } from '../models/Product'
+import { User } from '../models/User'
 
 export const getProducts = async (
     request: Request,
@@ -56,17 +57,15 @@ export const getCart = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     const userId = getUserIdFrom(request)
-    //     const cart = await getCartWithItems(userId)
-    //     response.render('shop/cart', {
-    //         pageTitle: 'Your Cart',
-    //         routePath: '/cart',
-    //         cartItems: cart?.cartItems
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        response.render('shop/cart', {
+            pageTitle: 'Your Cart',
+            routePath: '/cart',
+            cartItems: request.user.cart.items
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postCart = async (
@@ -74,8 +73,15 @@ export const postCart = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const quantity = 1
+    const newQuantity = 1
     const productId = request.body.productId
+    try {
+        const product: Product = await Product.findById(productId)
+        await User.addToCart(product, newQuantity, request.user)
+        response.redirect('/cart')
+    } catch (error) {
+        next(error)
+    }
     // try {
     //     const userId = getUserIdFrom(request)
     //     const cart = await findCartFor(userId)

@@ -2,6 +2,8 @@ import { database as db } from '../util/database'
 import mongodb from 'mongodb'
 import { Cart, CartItem, CartItemWithProduct, CartWithProducts } from './Cart'
 import { Product } from './Product'
+import { getCart } from '../controllers/shop'
+import { Order } from './Order'
 
 export class User {
     _id!: string
@@ -69,9 +71,17 @@ export class User {
     }
 
     static async addOrder(user: User): Promise<void> {
-        await convertCartToOrder(user)
+        const newOrder = await createNewOrder(user)
+        await addToDb(newOrder)
         emptyTheCart(user)
         await emptyTheCartInDb(user)
+    }
+
+    static async getOrders(user: User): Promise<Array<Order>> {
+        return await db()
+            .collection('orders')
+            .find({ 'user._id': new mongodb.ObjectId(user._id) })
+            .toArray()
     }
 }
 
@@ -89,7 +99,21 @@ function emptyTheCart(user: User) {
     user.cart.totalPrice = 0
 }
 
-async function convertCartToOrder(user: User) {
-    await db().collection('orders').insertOne(user.cart)
+async function addToDb(order: {
+    items: CartItemWithProduct[]
+    user: { _id: mongodb.ObjectID; name: string }
+}) {
+    await db().collection('orders').insertOne(order)
 }
 
+async function createNewOrder(user: User) {
+    const cart = await User.getCart(user)
+    const order = {
+        items: cart.items,
+        user: {
+            _id: new mongodb.ObjectID(user._id),
+            name: user.name
+        }
+    }
+    return order
+}

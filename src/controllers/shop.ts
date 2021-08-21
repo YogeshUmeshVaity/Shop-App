@@ -123,17 +123,16 @@ export const getOrders = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     const userId = getUserIdFrom(request)
-    //     const orders = await getOrdersFor(userId)
-    //     response.render('shop/orders', {
-    //         pageTitle: 'Your Orders',
-    //         routePath: '/orders',
-    //         orders: orders
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const orders = await User.getOrders(request.user)
+        response.render('shop/orders', {
+            pageTitle: 'Your Orders',
+            routePath: '/orders',
+            orders: orders
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getCheckout = (request: Request, response: Response): void => {

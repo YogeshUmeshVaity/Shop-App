@@ -110,16 +110,12 @@ export const postOrder = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     const userId = getUserIdFrom(request)
-    //     const cart = await getCartWithItems(userId)
-    //     const newOrder = await createNewOrder(userId)
-    //     moveCartItemsToNewOrder(cart, newOrder)
-    //     await clearTheCart(cart.id)
-    //     response.redirect('/orders')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        await User.addOrder(request.user)
+        response.redirect('/orders')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getOrders = async (

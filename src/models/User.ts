@@ -67,4 +67,29 @@ export class User {
             )
         console.log('Delete result', result)
     }
+
+    static async addOrder(user: User): Promise<void> {
+        await convertCartToOrder(user)
+        emptyTheCart(user)
+        await emptyTheCartInDb(user)
+    }
 }
+
+async function emptyTheCartInDb(user: User) {
+    await db()
+        .collection('users')
+        .updateOne(
+            { _id: new mongodb.ObjectId(user._id) },
+            { $set: { cart: { items: [], totalPrice: 0 } } }
+        )
+}
+
+function emptyTheCart(user: User) {
+    user.cart.items = []
+    user.cart.totalPrice = 0
+}
+
+async function convertCartToOrder(user: User) {
+    await db().collection('orders').insertOne(user.cart)
+}
+

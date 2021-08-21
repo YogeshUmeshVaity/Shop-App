@@ -19,6 +19,7 @@ export interface CartItemWithProduct {
     product: Product
     quantity: number
 }
+
 export class CartWithProducts {
     items: Array<CartItemWithProduct> = []
     totalPrice = 0

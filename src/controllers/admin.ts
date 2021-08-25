@@ -103,10 +103,10 @@ export const postDeleteProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     await Product.deleteById(request.params.productId)
-    //     response.redirect('/admin/products')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        await Product.findByIdAndRemove(request.params.productId)
+        response.redirect('/admin/products')
+    } catch (error) {
+        next(error)
+    }
 }

@@ -50,20 +50,17 @@ export const getEditProduct = async (
     next: NextFunction
 ): Promise<void> => {
     const productId = request.params.productId
-    // try {
-    //     const productToEdit = await Product.findById(productId)
-    //     if (!productToEdit) {
-    //         response.redirect('/')
-    //     }
-    //     response.render('admin/edit-product', {
-    //         pageTitle: 'Edit Product',
-    //         routePath: '/admin/edit-product',
-    //         isEditingMode: true,
-    //         productToEdit: productToEdit
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const productToEdit = await Product.findById(productId).orFail()
+        response.render('admin/edit-product', {
+            pageTitle: 'Edit Product',
+            routePath: '/admin/edit-product',
+            isEditingMode: true,
+            productToEdit: productToEdit
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postEditProduct = async (
@@ -71,19 +68,18 @@ export const postEditProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     const result = await Product.update(
-    //         request.body.productId,
-    //         request.body.title,
-    //         request.body.imageUrl,
-    //         request.body.description,
-    //         request.body.price
-    //     )
-    //     // TODO: handleResult(result)
-    //     return response.redirect('/admin/products')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const result = await Product.findByIdAndUpdate(request.body.productId, {
+            title: request.body.title,
+            imageUrl: request.body.imageUrl,
+            description: request.body.description,
+            price: request.body.price
+        })
+        // TODO: handleResult(result)
+        return response.redirect('/admin/products')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getProducts = async (
@@ -91,15 +87,15 @@ export const getProducts = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     response.render('admin/product-list', {
-    //         productList: await Product.findAll(),
-    //         pageTitle: 'Admin Products',
-    //         routePath: '/admin/products'
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        response.render('admin/product-list', {
+            productList: await Product.find(),
+            pageTitle: 'Admin Products',
+            routePath: '/admin/products'
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postDeleteProduct = async (

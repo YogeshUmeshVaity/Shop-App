@@ -18,6 +18,7 @@
   "devDependencies": {
     "@types/express-handlebars": "^5.3.0",
     "@types/mongodb": "^3.6.20",
+    "@types/mongoose": "^5.11.97",
     "@types/node": "^14.17.4",
     "@types/validator": "^13.1.4",
     "@typescript-eslint/eslint-plugin": "^4.1.0",
@@ -42,6 +43,7 @@
     "express": "^4.17.1",
     "express-handlebars": "^5.3.2",
     "mongodb": "^3.6.10",
+    "mongoose": "^5.13.7",
     "mysql2": "^2.2.5",
     "pug": "^3.0.2",
     "reflect-metadata": "^0.1.13",

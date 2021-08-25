@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { Product } from '../models/Product'
-import { User } from '../models/User'
+import Product from '../models/Product'
 
 export const getProducts = async (
     request: Request,
@@ -9,7 +8,7 @@ export const getProducts = async (
 ): Promise<void> => {
     try {
         response.render('shop/product-list', {
-            productList: await Product.findAll(),
+            productList: await Product.find(),
             pageTitle: 'All Products',
             routePath: '/products'
         })
@@ -25,7 +24,7 @@ export const getProductDetails = async (
 ): Promise<void> => {
     const productId = request.params.productId
     try {
-        const requestedProduct = await Product.findById(productId)
+        const requestedProduct = await Product.findById(productId).orFail()
         response.render('shop/product-details', {
             product: requestedProduct,
             pageTitle: requestedProduct.title,
@@ -43,7 +42,7 @@ export const getIndex = async (
 ): Promise<void> => {
     try {
         response.render('shop/index', {
-            productList: await Product.findAll(),
+            productList: await Product.find(),
             pageTitle: 'Shop',
             routePath: '/'
         })
@@ -57,16 +56,16 @@ export const getCart = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    try {
-        const cart = await User.getCart(request.user)
-        response.render('shop/cart', {
-            pageTitle: 'Your Cart',
-            routePath: '/cart',
-            cartItems: cart.items
-        })
-    } catch (error) {
-        next(error)
-    }
+    // try {
+    //     const cart = await User.getCart(request.user)
+    //     response.render('shop/cart', {
+    //         pageTitle: 'Your Cart',
+    //         routePath: '/cart',
+    //         cartItems: cart.items
+    //     })
+    // } catch (error) {
+    //     next(error)
+    // }
 }
 
 export const postCart = async (
@@ -76,13 +75,13 @@ export const postCart = async (
 ): Promise<void> => {
     const newQuantity = 1
     const productId = request.body.productId
-    try {
-        const product: Product = await Product.findById(productId)
-        await User.addToCart(product, newQuantity, request.user)
-        response.redirect('/cart')
-    } catch (error) {
-        next(error)
-    }
+    // try {
+    //     const product: Product = await Product.findById(productId)
+    //     await User.addToCart(product, newQuantity, request.user)
+    //     response.redirect('/cart')
+    // } catch (error) {
+    //     next(error)
+    // }
 }
 
 export const deleteCartItem = async (
@@ -93,16 +92,12 @@ export const deleteCartItem = async (
     const productId: string = request.body.itemId
     console.log('Product to delete ID', productId)
     
-    try {
-        // const userId = getUserIdFrom(request)
-        // const cart = await findCartFor(userId)
-        // await ensureIfItemIsFromThisUser(itemId, cart)
-        // await db.cartItem.delete({ where: { id: itemId } })
-        await User.deleteCartItem(productId, request.user)
-        response.redirect('/cart')
-    } catch (error) {
-        next(error)
-    }
+    // try {
+    //     await User.deleteCartItem(productId, request.user)
+    //     response.redirect('/cart')
+    // } catch (error) {
+    //     next(error)
+    // }
 }
 
 export const postOrder = async (
@@ -110,12 +105,12 @@ export const postOrder = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    try {
-        await User.addOrder(request.user)
-        response.redirect('/orders')
-    } catch (error) {
-        next(error)
-    }
+    // try {
+    //     await User.addOrder(request.user)
+    //     response.redirect('/orders')
+    // } catch (error) {
+    //     next(error)
+    // }
 }
 
 export const getOrders = async (
@@ -123,16 +118,16 @@ export const getOrders = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    try {
-        const orders = await User.getOrders(request.user)
-        response.render('shop/orders', {
-            pageTitle: 'Your Orders',
-            routePath: '/orders',
-            orders: orders
-        })
-    } catch (error) {
-        next(error)
-    }
+    // try {
+    //     const orders = await User.getOrders(request.user)
+    //     response.render('shop/orders', {
+    //         pageTitle: 'Your Orders',
+    //         routePath: '/orders',
+    //         orders: orders
+    //     })
+    // } catch (error) {
+    //     next(error)
+    // }
 }
 
 export const getCheckout = (request: Request, response: Response): void => {

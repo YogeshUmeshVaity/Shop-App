@@ -3,7 +3,7 @@ import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import path from 'path'
 import dotenv from 'dotenv'
-import { connectMongoDb, connectOptions, databaseUrl } from './util/database'
+import { connectOptions, databaseUrl } from './util/database'
 import mongoose from 'mongoose'
 
 // Controllers

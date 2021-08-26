@@ -1,6 +1,7 @@
 import { getModelForClass, modelOptions, prop, Ref, Severity } from '@typegoose/typegoose'
 
 // @modelOptions({ schemaOptions: { timestamps: true }, options: { customName: 'products' } })
+@modelOptions({ options: { allowMixed: Severity.ALLOW } })
 class Product {
     @prop()
     title!: string
@@ -13,11 +14,14 @@ class Product {
 
     @prop()
     imageUrl!: string
+
+    @prop({ required: true })
+    public createdByUserId!: Ref<User>
 }
 
 class CartItem {
     @prop()
-    product!: Ref<Product>
+    productId!: Ref<Product>
 
     @prop()
     quantity!: number

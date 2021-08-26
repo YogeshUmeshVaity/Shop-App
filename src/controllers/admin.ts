@@ -50,8 +50,8 @@ export const postAddProduct = async (
             title: request.body.title,
             price: request.body.price,
             description: request.body.description,
-            imageUrl: request.body.imageUrl
-            //request.user._id
+            imageUrl: request.body.imageUrl,
+            createdByUserId: request.user._id
         })
         await newProduct.save()
         response.redirect('/')

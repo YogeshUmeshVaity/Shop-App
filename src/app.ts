@@ -35,11 +35,6 @@ app.use('/', shopRoutes)
 
 app.use(errorController.get404)
 
-// TODO: Delete this mongodb code, it's taken care by mongoose
-// connectMongoDb(() => {
-//     app.listen(3000)
-// })
-
 mongoose
     .connect(databaseUrl(), connectOptions)
     .then(() => {

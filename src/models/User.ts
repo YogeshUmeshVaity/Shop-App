@@ -1,3 +1,6 @@
+import { prop } from "@typegoose/typegoose"
+
+
 // import { database as db } from '../util/database'
 // import mongodb from 'mongodb'
 // import { Cart, CartItem, CartItemWithProduct, CartWithProducts } from './Cart'

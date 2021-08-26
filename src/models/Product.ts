@@ -1,6 +1,7 @@
-import { getModelForClass, prop } from '@typegoose/typegoose'
+import { getModelForClass, modelOptions, prop, Ref, Severity } from '@typegoose/typegoose'
 
-class ProductModel {
+// @modelOptions({ schemaOptions: { timestamps: true }, options: { customName: 'products' } })
+class Product {
     @prop()
     title!: string
 
@@ -14,7 +15,36 @@ class ProductModel {
     imageUrl!: string
 }
 
-export const Product = getModelForClass(ProductModel)
+class CartItem {
+    @prop()
+    product!: Ref<Product>
+
+    @prop()
+    quantity!: number
+}
+
+@modelOptions({ options: { allowMixed: Severity.ALLOW } })
+class Cart {
+    @prop()
+    items?: CartItem[]
+
+    @prop()
+    totalPrice = 0
+}
+
+class User {
+    @prop()
+    name!: string
+
+    @prop()
+    email!: string
+
+    @prop({ _id: false })
+    cart?: Cart
+}
+
+export const ProductModel = getModelForClass(Product)
+export const UserModel = getModelForClass(User)
 
 // import { Schema, Document } from 'mongoose'
 // import mongoose from 'mongoose'

@@ -1,26 +1,42 @@
 import { NextFunction, Request, Response } from 'express'
-import { Product } from '../models/Product'
+import { ProductModel as Product } from '../models/Product'
+import { UserModel as User } from '../models/Product'
 
 export const createTestUser = async (
     request: Request,
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     // This user along with its cart with items should be manually created directly in the database.
-    //     request.user = await User.findById('60f02a0419a7eaf596a820ee')
-    //     console.log('Current user: ', request.user)
-    //     next()
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        // This user along with its cart with items should be manually created directly in the database.
+        request.user = await User.findById('6127bd9d204a47128947a07d')
+        console.log('Current user: ', request.user)
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const createTestUser1 = async (): Promise<void> => {
+    const user = await User.findOne()
+    if (!user) {
+        const user = new User({
+            name: 'John',
+            email: 'john@test.com',
+            cart: {
+                items: [],
+                totalPrice: 0
+            }
+        })
+        await user.save()
+    }
 }
 
 export const getAddProduct = (request: Request, response: Response): void => {
     return response.render('admin/edit-product', {
         pageTitle: 'Add Product',
         routePath: '/admin/add-product',
-        isEditingMode: false,
+        isEditingMode: false
     })
 }
 
@@ -34,7 +50,7 @@ export const postAddProduct = async (
             title: request.body.title,
             price: request.body.price,
             description: request.body.description,
-            imageUrl: request.body.imageUrl,
+            imageUrl: request.body.imageUrl
             //request.user._id
         })
         await newProduct.save()

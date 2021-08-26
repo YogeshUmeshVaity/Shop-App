@@ -8,7 +8,9 @@ import mongoose from 'mongoose'
 
 // Controllers
 import * as errorController from './controllers/error'
-import { createTestUser } from './controllers/admin'
+import { createTestUser as initializeTestUser } from './controllers/admin'
+import { createTestUser1 as createTestUser } from './controllers/admin'
+
 
 const app = express()
 
@@ -23,7 +25,7 @@ app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.urlencoded({ extended: false }))
 
-//app.use(createTestUser)
+app.use(initializeTestUser)
 
 // Used for serving public static files.
 app.use(express.static(path.join(__dirname, 'public')))
@@ -40,5 +42,8 @@ app.use(errorController.get404)
 
 mongoose
     .connect(databaseUrl(), connectOptions)
-    .then(() => app.listen(3000))
+    .then(() => {
+        createTestUser()
+        app.listen(3000)
+    })
     .catch((error) => console.log(error))

@@ -30,7 +30,8 @@ export function databaseUrl(): string {
 
 export const connectOptions = {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
 }
 
 // TODO: Delete this mongodb code, it's taken care by mongoose

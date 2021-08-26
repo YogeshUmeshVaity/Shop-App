@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import Product from '../models/Product'
+import { Product } from '../models/Product'
 
 export const getProducts = async (
     request: Request,

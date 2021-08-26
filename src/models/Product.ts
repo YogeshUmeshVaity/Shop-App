@@ -1,28 +1,46 @@
-import { Schema, Document } from 'mongoose'
-import mongoose from 'mongoose'
+import { getModelForClass, prop } from '@typegoose/typegoose'
 
-interface IProduct extends Document {
-    title: string
-    price: number
-    description: string
-    imageUrl: string
-    // createdByUserId: string
+class ProductModel {
+    @prop()
+    title!: string
+
+    @prop()
+    price!: number
+
+    @prop()
+    description?: string
+
+    @prop()
+    imageUrl!: string
 }
 
-const ProductSchema: Schema = new Schema(
-    {
-        title: { type: String, required: true },
-        price: { type: Number, required: true },
-        description: { type: String, required: true },
-        imageUrl: { type: String, required: true }
-        // createdByUserId: { type: String, required: true }
-    },
-    {
-        timestamps: true
-    }
-)
+export const Product = getModelForClass(ProductModel)
 
-export default mongoose.model<IProduct>('Product', ProductSchema)
+// import { Schema, Document } from 'mongoose'
+// import mongoose from 'mongoose'
+
+// interface IProduct extends Document {
+//     title: string
+//     price: number
+//     description: string
+//     imageUrl: string
+//     // createdByUserId: string
+// }
+
+// const ProductSchema: Schema = new Schema(
+//     {
+//         title: { type: String, required: true },
+//         price: { type: Number, required: true },
+//         description: { type: String, required: true },
+//         imageUrl: { type: String, required: true }
+//         // createdByUserId: { type: String, required: true }
+//     },
+//     {
+//         timestamps: true
+//     }
+// )
+
+// export default mongoose.model<IProduct>('Product', ProductSchema)
 
 // export class Product {
 //     _id!: string

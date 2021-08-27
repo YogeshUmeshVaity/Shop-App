@@ -1,8 +1,12 @@
 import { getModelForClass, modelOptions, prop, Ref, Severity } from '@typegoose/typegoose'
+import { User } from './User'
 
-// @modelOptions({ schemaOptions: { timestamps: true }, options: { customName: 'products' } })
-@modelOptions({ options: { allowMixed: Severity.ALLOW } })
-class Product {
+@modelOptions({
+    /* schemaOptions: { timestamps: true }, */
+    options: { /*customName: 'products', */ allowMixed: Severity.ALLOW }
+})
+export class Product {
+    // TODO: Add required option for properties in all models
     @prop()
     title!: string
 
@@ -19,36 +23,7 @@ class Product {
     public createdByUserId!: Ref<User>
 }
 
-class CartItem {
-    @prop()
-    productId!: Ref<Product>
-
-    @prop()
-    quantity!: number
-}
-
-@modelOptions({ options: { allowMixed: Severity.ALLOW } })
-class Cart {
-    @prop()
-    items?: CartItem[]
-
-    @prop()
-    totalPrice = 0
-}
-
-class User {
-    @prop()
-    name!: string
-
-    @prop()
-    email!: string
-
-    @prop({ _id: false })
-    cart?: Cart
-}
-
 export const ProductModel = getModelForClass(Product)
-export const UserModel = getModelForClass(User)
 
 // import { Schema, Document } from 'mongoose'
 // import mongoose from 'mongoose'

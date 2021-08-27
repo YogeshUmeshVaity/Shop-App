@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
-import { UserModel as User } from '../models/Product'
+import { UserModel as User } from '../models/User'
 
 export const createTestUser = async (
     request: Request,

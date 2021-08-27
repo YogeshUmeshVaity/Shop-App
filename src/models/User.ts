@@ -1,5 +1,18 @@
-import { prop } from "@typegoose/typegoose"
+import { getModelForClass, prop } from '@typegoose/typegoose'
+import { Cart } from './cart'
 
+export class User {
+    @prop()
+    name!: string
+
+    @prop()
+    email!: string
+
+    @prop({ _id: false })
+    cart?: Cart
+}
+
+export const UserModel = getModelForClass(User)
 
 // import { database as db } from '../util/database'
 // import mongodb from 'mongodb'

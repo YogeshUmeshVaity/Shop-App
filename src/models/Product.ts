@@ -6,20 +6,21 @@ import { User } from './User'
     options: { /*customName: 'products', */ allowMixed: Severity.ALLOW }
 })
 export class Product {
-    // TODO: Add required option for properties in all models
-    @prop()
+    @prop({ required: true })
     title!: string
 
-    @prop()
+    @prop({ required: true })
     price!: number
 
     @prop()
     description?: string
 
-    @prop()
+    @prop({ required: true })
     imageUrl!: string
 
-    @prop({ required: true })
+    // This is an example of a single Reference
+    // Writing ref: () => User results in an error
+    @prop({ ref: 'User', required: true })
     public createdByUserId!: Ref<User>
 }
 

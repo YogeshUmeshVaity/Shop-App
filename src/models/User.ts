@@ -3,15 +3,17 @@ import { Cart } from './cart'
 import { Product } from './Product'
 
 export class User {
-    @prop()
+    @prop({ required: true })
     name!: string
 
-    @prop()
+    @prop({ required: true })
     email!: string
 
-    @prop({ _id: false })
+    // This is an example of a single SubDocument
+    @prop({ required: true, _id: false })
     cart!: Cart
 
+    // Instance method docs: https://typegoose.github.io/typegoose/docs/guides/quick-start-guide/#instance-methods
     public async addToCart(
         this: DocumentType<User>,
         product: DocumentType<Product>,
@@ -33,6 +35,35 @@ export class User {
         console.log('This user cart', this.cart)
         // this.save() doesn't work for some reason
         await getModelForClass(User).findByIdAndUpdate({ _id: this._id }, { cart: updatedCart })
+    }
+
+    public async getCart(this: DocumentType<User>): Promise<void> {
+        const userWithCart = await this.populate('cart.items.productId').execPopulate()
+        console.log('User with Cart Products', userWithCart.cart.items)
+        // const UserModel = getModelForClass(User)
+        // const userWithCartProducts = await UserModel.find()
+        //     .populate('cart.items.productId')
+        //     .execPopulate() //await this.populate('cart.items')
+        // console.log('User with Cart Products', userWithCartProducts[0].cart)
+
+        // const cartProductIds = user.cart.items.map((items) => items.productId)
+        // const cartProducts: Array<Product> = await db()
+        //     .collection('products')
+        //     .find({ _id: { $in: cartProductIds } })
+        //     .toArray()
+        // const cartItems = cartProducts.map((product) => {
+        //     let quantity = user.cart.items.find((cartItem) => {
+        //         return cartItem.productId.toString() === product._id.toString()
+        //     })?.quantity
+        //     if (!quantity) quantity = 0
+        //     return {
+        //         product: { ...product },
+        //         quantity: quantity
+        //     }
+        // })
+
+        // console.log({ items: [...cartItems], totalPrice: 0 })
+        // return { items: [...cartItems], totalPrice: 0 }
     }
 }
 

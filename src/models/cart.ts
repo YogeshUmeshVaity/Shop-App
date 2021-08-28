@@ -1,21 +1,24 @@
 import { modelOptions, prop, Ref, Severity } from '@typegoose/typegoose'
 import { Product } from './Product'
 
-class CartItem {
-    @prop()
+export class CartItem {
+    // This is an example of a single reference
+    // Writing ref: () => User results in an error
+    @prop({ ref: 'Product', required: true })
     productId!: Ref<Product>
 
-    @prop()
+    @prop({ required: true })
     quantity!: number
 }
 
 @modelOptions({ options: { allowMixed: Severity.ALLOW } })
 export class Cart {
-    @prop()
+    // This is an example of a SubDocument Array
+    @prop({ type: () => CartItem, required: true, _id: false }) // specifying type here is important
     items!: CartItem[]
 
-    @prop()
-    totalPrice = 0
+    @prop({ required: true })
+    totalPrice!: number
 }
 
 // import path from 'path'

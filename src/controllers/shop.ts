@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
+import { User } from '../models/User'
 
 export const getProducts = async (
     request: Request,
@@ -56,16 +57,19 @@ export const getCart = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     const cart = await User.getCart(request.user)
-    //     response.render('shop/cart', {
-    //         pageTitle: 'Your Cart',
-    //         routePath: '/cart',
-    //         cartItems: cart.items
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const userWithCartProducts = await request.user
+            .populate('cart.items.productId')
+            .execPopulate()
+            console.log('User with Cart Products', userWithCartProducts.cart)
+        response.render('shop/cart', {
+            pageTitle: 'Your Cart',
+            routePath: '/cart',
+            cartItems: userWithCartProducts.cart.items
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postCart = async (

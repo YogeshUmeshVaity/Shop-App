@@ -1,4 +1,4 @@
-import { getModelForClass, modelOptions, prop, Ref, Severity } from '@typegoose/typegoose'
+import { modelOptions, prop, Ref, Severity } from '@typegoose/typegoose'
 import { Product } from './Product'
 
 class CartItem {
@@ -12,7 +12,7 @@ class CartItem {
 @modelOptions({ options: { allowMixed: Severity.ALLOW } })
 export class Cart {
     @prop()
-    items?: CartItem[]
+    items!: CartItem[]
 
     @prop()
     totalPrice = 0

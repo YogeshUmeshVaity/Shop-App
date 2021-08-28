@@ -1,5 +1,6 @@
-import { getModelForClass, prop } from '@typegoose/typegoose'
+import { DocumentType, getModelForClass, prop } from '@typegoose/typegoose'
 import { Cart } from './cart'
+import { Product } from './Product'
 
 export class User {
     @prop()
@@ -9,7 +10,30 @@ export class User {
     email!: string
 
     @prop({ _id: false })
-    cart?: Cart
+    cart!: Cart
+
+    public async addToCart(
+        this: DocumentType<User>,
+        product: DocumentType<Product>,
+        newQuantity: number
+    ): Promise<void> {
+        const updatedCartItems = this.cart.items
+        const existingItemIndex = this.cart.items.findIndex(
+            (item) => item.productId?.toString() === product._id.toString()
+        )
+        console.log('Existing Item Index', existingItemIndex)
+        if (existingItemIndex >= 0) {
+            updatedCartItems[existingItemIndex].quantity += newQuantity
+        } else {
+            updatedCartItems.push({ productId: product._id, quantity: newQuantity })
+        }
+        const updatedCart: Cart = { items: updatedCartItems, totalPrice: 0 }
+        console.log('Updated cart:', updatedCart)
+        this.cart = updatedCart
+        console.log('This user cart', this.cart)
+        // this.save() doesn't work for some reason
+        await getModelForClass(User).findByIdAndUpdate({ _id: this._id }, { cart: updatedCart })
+    }
 }
 
 export const UserModel = getModelForClass(User)

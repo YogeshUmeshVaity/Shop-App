@@ -75,13 +75,14 @@ export const postCart = async (
 ): Promise<void> => {
     const newQuantity = 1
     const productId = request.body.productId
-    // try {
-    //     const product: Product = await Product.findById(productId)
-    //     await User.addToCart(product, newQuantity, request.user)
-    //     response.redirect('/cart')
-    // } catch (error) {
-    //     next(error)
-    // }
+    const user = request.user
+    try {
+        const product = await Product.findById(productId).orFail()
+        await user.addToCart(product, newQuantity)
+        response.redirect('/cart')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const deleteCartItem = async (

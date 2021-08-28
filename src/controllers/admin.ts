@@ -10,7 +10,7 @@ export const createTestUser = async (
     try {
         // This user along with its cart with items should be manually created directly in the database.
         request.user = await User.findById('6127bd9d204a47128947a07d')
-        console.log('Current user: ', request.user)
+        // console.log('Current user: ', request.user)
         next()
     } catch (error) {
         next(error)

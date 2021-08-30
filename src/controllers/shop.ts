@@ -96,13 +96,12 @@ export const deleteCartItem = async (
 ): Promise<void> => {
     const productId: string = request.body.itemId
     console.log('Product to delete ID', productId)
-    
-    // try {
-    //     await User.deleteCartItem(productId, request.user)
-    //     response.redirect('/cart')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        await request.user.deleteCartItem(productId, request.user)
+        response.redirect('/cart')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const postOrder = async (

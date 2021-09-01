@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { OrderModel as Order } from '../models/Order'
-import { User } from '../models/User'
 
 export const getProducts = async (
     request: Request,
@@ -141,100 +140,3 @@ export const getCheckout = (request: Request, response: Response): void => {
         routePath: '/checkout'
     })
 }
-
-// function moveCartItemsToNewOrder(cart: CartWithItems, newOrder: Order) {
-//     cart.cartItems.forEach(async (cartItem) => {
-//         await db.orderItem.create({
-//             data: {
-//                 productId: cartItem.productId,
-//                 quantity: cartItem.quantity,
-//                 orderId: newOrder.id
-//             }
-//         })
-//     })
-// }
-
-// async function createNewOrder(userId: string) {
-//     return await db.order.create({
-//         data: {
-//             userId: userId
-//         }
-//     })
-// }
-
-function getUserIdFrom(request: Request): string {
-    const userId = request.user?.id
-    if (!userId) throw Error('User ID is undefined.')
-    return userId
-}
-
-// async function getOrdersFor(userId: string) {
-//     return await db.order.findMany({
-//         where: {
-//             userId: userId
-//         },
-//         include: {
-//             orderItems: {
-//                 include: {
-//                     product: true
-//                 }
-//             }
-//         }
-//     })
-// }
-
-// async function clearTheCart(cartId: string) {
-//     await db.cartItem.deleteMany({ where: { cartId: cartId } })
-// }
-
-// Throws error if the cart-item doesn't belong to this user. This is a safety net.
-// async function ensureIfItemIsFromThisUser(itemId: string, cart: Cart) {
-//     return await db.cartItem.findFirst({
-//         where: {
-//             AND: [{ id: itemId }, { cartId: cart.id }]
-//         },
-//         rejectOnNotFound: true
-//     })
-// }
-
-// async function createNewCartItem(productId: string, cart: Cart, addedQuantity: number) {
-//     await db.cartItem.create({
-//         data: { productId: productId, cartId: cart.id, quantity: addedQuantity }
-//     })
-// }
-
-// async function increaseQuantityOf(existingCartItem: CartItem, addedQuantity: number) {
-//     await db.cartItem.update({
-//         where: { id: existingCartItem.id },
-//         data: { quantity: existingCartItem.quantity + addedQuantity }
-//     })
-// }
-
-// async function findExistingItemIn(cart: Cart, productId: string) {
-//     return await db.cartItem.findFirst({
-//         where: {
-//             AND: [{ cartId: cart.id }, { productId: productId }]
-//         }
-//     })
-// }
-
-// async function findCartFor(userId: string) {
-//     return await db.cart.findFirst({
-//         where: { userId: userId },
-//         rejectOnNotFound: true
-//     })
-// }
-
-// async function getCartWithItems(userId: string) {
-//     return await db.cart.findFirst({
-//         where: { userId: userId },
-//         include: {
-//             cartItems: {
-//                 include: {
-//                     product: true
-//                 }
-//             }
-//         },
-//         rejectOnNotFound: true
-//     })
-// }

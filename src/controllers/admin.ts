@@ -120,7 +120,9 @@ export const postDeleteProduct = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        await Product.findByIdAndRemove(request.params.productId)
+        const productId = request.params.productId
+        await Product.findByIdAndRemove(productId)
+        await request.user.deleteCartItem(productId)
         response.redirect('/admin/products')
     } catch (error) {
         next(error)

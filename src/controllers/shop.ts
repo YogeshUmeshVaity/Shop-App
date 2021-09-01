@@ -52,6 +52,7 @@ export const getIndex = async (
     }
 }
 
+// TODO: App crashes after you navigate to cart when a product is deleted and while it's in the cart
 export const getCart = async (
     request: Request,
     response: Response,

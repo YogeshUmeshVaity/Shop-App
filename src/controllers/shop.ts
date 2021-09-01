@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import { Order } from '../models/Order'
 import { ProductModel as Product } from '../models/Product'
 import { User } from '../models/User'
 
@@ -61,7 +62,7 @@ export const getCart = async (
         const userWithCartProducts = await request.user
             .populate('cart.items.productId')
             .execPopulate()
-            console.log('User with Cart Products', userWithCartProducts.cart)
+        console.log('User with Cart Products', userWithCartProducts.cart)
         response.render('shop/cart', {
             pageTitle: 'Your Cart',
             routePath: '/cart',
@@ -109,12 +110,12 @@ export const postOrder = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     await User.addOrder(request.user)
-    //     response.redirect('/orders')
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        await Order.addOrder(request.user)
+        response.redirect('/orders')
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getOrders = async (

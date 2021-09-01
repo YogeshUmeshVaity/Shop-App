@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
-import { Order } from '../models/Order'
 import { ProductModel as Product } from '../models/Product'
+import { OrderModel as Order } from '../models/Order'
 import { User } from '../models/User'
 
 export const getProducts = async (
@@ -123,16 +123,16 @@ export const getOrders = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // try {
-    //     const orders = await User.getOrders(request.user)
-    //     response.render('shop/orders', {
-    //         pageTitle: 'Your Orders',
-    //         routePath: '/orders',
-    //         orders: orders
-    //     })
-    // } catch (error) {
-    //     next(error)
-    // }
+    try {
+        const orders = await Order.find({ 'user._id': request.user._id })
+        response.render('shop/orders', {
+            pageTitle: 'Your Orders',
+            routePath: '/orders',
+            orders: orders
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export const getCheckout = (request: Request, response: Response): void => {

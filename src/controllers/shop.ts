@@ -11,7 +11,8 @@ export const getProducts = async (
         response.render('shop/product-list', {
             productList: await Product.find(),
             pageTitle: 'All Products',
-            routePath: '/products'
+            routePath: '/products',
+            isAuthenticated: request.isLoggedIn
         })
     } catch (error) {
         next(error)
@@ -29,7 +30,8 @@ export const getProductDetails = async (
         response.render('shop/product-details', {
             product: requestedProduct,
             pageTitle: requestedProduct.title,
-            routePath: '/products'
+            routePath: '/products',
+            isAuthenticated: request.isLoggedIn
         })
     } catch (error) {
         next(error)
@@ -45,7 +47,8 @@ export const getIndex = async (
         response.render('shop/index', {
             productList: await Product.find(),
             pageTitle: 'Shop',
-            routePath: '/'
+            routePath: '/',
+            isAuthenticated: request.isLoggedIn
         })
     } catch (error) {
         next(error)
@@ -66,7 +69,8 @@ export const getCart = async (
         response.render('shop/cart', {
             pageTitle: 'Your Cart',
             routePath: '/cart',
-            cartItems: userWithCartProducts.cart.items
+            cartItems: userWithCartProducts.cart.items,
+            isAuthenticated: request.isLoggedIn
         })
     } catch (error) {
         next(error)
@@ -128,7 +132,8 @@ export const getOrders = async (
         response.render('shop/orders', {
             pageTitle: 'Your Orders',
             routePath: '/orders',
-            orders: orders
+            orders: orders,
+            isAuthenticated: request.isLoggedIn
         })
     } catch (error) {
         next(error)
@@ -138,6 +143,7 @@ export const getOrders = async (
 export const getCheckout = (request: Request, response: Response): void => {
     response.render('shop/checkout', {
         pageTitle: 'Checkout',
-        routePath: '/checkout'
+        routePath: '/checkout',
+        isAuthenticated: request.isLoggedIn
     })
 }

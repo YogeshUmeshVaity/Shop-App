@@ -36,7 +36,8 @@ export const getAddProduct = (request: Request, response: Response): void => {
     return response.render('admin/edit-product', {
         pageTitle: 'Add Product',
         routePath: '/admin/add-product',
-        isEditingMode: false
+        isEditingMode: false,
+        isAuthenticated: request.isLoggedIn
     })
 }
 
@@ -72,7 +73,8 @@ export const getEditProduct = async (
             pageTitle: 'Edit Product',
             routePath: '/admin/edit-product',
             isEditingMode: true,
-            productToEdit: productToEdit
+            productToEdit: productToEdit,
+            isAuthenticated: request.isLoggedIn
         })
     } catch (error) {
         next(error)
@@ -107,7 +109,8 @@ export const getProducts = async (
         response.render('admin/product-list', {
             productList: await Product.find(),
             pageTitle: 'Admin Products',
-            routePath: '/admin/products'
+            routePath: '/admin/products',
+            isAuthenticated: request.isLoggedIn
         })
     } catch (error) {
         next(error)

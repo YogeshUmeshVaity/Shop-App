@@ -1,6 +1,7 @@
 import express from 'express'
 import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
+import { authRoutes } from './routes/authentication'
 import path from 'path'
 import dotenv from 'dotenv'
 import { connectOptions, databaseUrl } from './util/database'
@@ -10,7 +11,6 @@ import mongoose from 'mongoose'
 import * as errorController from './controllers/error'
 import { createTestUser as initializeTestUser } from './controllers/admin'
 import { createTestUser1 as createTestUser } from './controllers/admin'
-
 
 const app = express()
 
@@ -32,8 +32,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/admin', adminRoutes)
 app.use('/', shopRoutes)
+app.use('/', authRoutes)
 
-app.use(errorController.get404)
+//app.use(errorController.get404)
 
 mongoose
     .connect(databaseUrl(), connectOptions)

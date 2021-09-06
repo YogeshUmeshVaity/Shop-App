@@ -11,6 +11,8 @@ import mongoose from 'mongoose'
 import * as errorController from './controllers/error'
 import { createTestUser as initializeTestUser } from './controllers/admin'
 import { createTestUser1 as createTestUser } from './controllers/admin'
+import { initializeSession } from './controllers/authentication'
+import session from 'express-session'
 
 const app = express()
 
@@ -24,6 +26,10 @@ app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.urlencoded({ extended: false }))
+
+// Initialize session.
+//app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false }))
+app.use(initializeSession)
 
 app.use(initializeTestUser)
 

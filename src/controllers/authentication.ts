@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
+//import { sessionOptions } from '../util/database'
+import mongoDbSession from 'connect-mongodb-session'
+import { databaseUrl } from '../util/database'
 
 /**
  * Fetches session secrete from .env file and initializes the express-session.
@@ -12,11 +15,21 @@ export const initializeSession = async (
     try {
         const sessionSecret = process.env.SESSION_SECRET
         if (!sessionSecret) throw Error('Express Session Secrete is undefined.')
-        session({ secret: sessionSecret, resave: false, saveUninitialized: false })(
-            request,
-            response,
-            next
-        )
+
+        const MongoDbStore = mongoDbSession(session)
+
+        const sessionStore = new MongoDbStore({
+            uri: databaseUrl(),
+            collection: 'sessions'
+        })
+
+        // This creates a session middleware and calls it.
+        session({
+            secret: sessionSecret,
+            resave: false,
+            saveUninitialized: false,
+            store: sessionStore
+        })(request, response, next)
         // Do not call next() here. It causes error.
     } catch (error) {
         next(error)
@@ -60,7 +73,7 @@ export const postLogin = async (
     //response.setHeader('Set-Cookie', 'loggedIn=true')
 
     // We let the session manage the cookie for us automatically, instead of setting the cookie
-    // manually in the code above.
+    // manually like in the commented code above.
     request.session.isLoggedIn = true
     response.redirect('/')
 }

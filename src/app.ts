@@ -12,7 +12,6 @@ import * as errorController from './controllers/error'
 import { createTestUser as initializeTestUser } from './controllers/admin'
 import { createTestUser1 as createTestUser } from './controllers/admin'
 import { initializeSession } from './controllers/authentication'
-import session from 'express-session'
 
 const app = express()
 

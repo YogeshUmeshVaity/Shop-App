@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: false }))
 //app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false }))
 app.use(initializeSession)
 
-app.use(initializeTestUser)
+// app.use(initializeTestUser)
 
 // Used for serving public static files.
 app.use(express.static(path.join(__dirname, 'public')))

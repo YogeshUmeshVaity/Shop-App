@@ -3,6 +3,8 @@ import session from 'express-session'
 //import { sessionOptions } from '../util/database'
 import mongoDbSession from 'connect-mongodb-session'
 import { databaseUrl } from '../util/database'
+import { User, UserModel } from '../models/User'
+import { DocumentType } from '@typegoose/typegoose'
 
 /**
  * Fetches session secrete from .env file and initializes the express-session.
@@ -41,11 +43,6 @@ export const getLogin = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // Extracting the cookie information.
-    const isLoggedIn = request.get('Cookie')?.split(';')[0].trim().split('=')[1]
-
-    // Print current session object to confirm that the session exists.
-    console.log(request.session)
 
     // If you click login menu and then click login button, this will be `true` (user 1)
     // Now if you open this website and click login menu, this will be 'false' (user 2)
@@ -55,7 +52,7 @@ export const getLogin = async (
     response.render('authentication/login', {
         pageTitle: 'Login',
         routePath: '/login',
-        isAuthenticated: isLoggedIn
+        isAuthenticated: request.session.isLoggedIn
     })
 }
 
@@ -64,16 +61,13 @@ export const postLogin = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // If there were no cookies, this data wouldn't persist once the response is sent.
-    // The subsequent requests are brand new requests.
-    // request.isLoggedIn = true
-
-    // Once the cookie is set in the browser, the browser automatically sends it back to server
-    // with every subsequent request.
-    //response.setHeader('Set-Cookie', 'loggedIn=true')
-
-    // We let the session manage the cookie for us automatically, instead of setting the cookie
-    // manually like in the commented code above.
-    request.session.isLoggedIn = true
-    response.redirect('/')
+    try {
+        // By setting the user on the session, we share it across requests and is not just valid for
+        // this single request.
+        request.session.user = await UserModel.findById('6127bd9d204a47128947a07d').orFail().exec()
+        request.session.isLoggedIn = true
+        response.redirect('/')
+    } catch (error) {
+        next(error)
+    }
 }

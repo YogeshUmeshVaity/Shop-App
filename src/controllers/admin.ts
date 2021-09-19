@@ -37,7 +37,7 @@ export const getAddProduct = (request: Request, response: Response): void => {
         pageTitle: 'Add Product',
         routePath: '/admin/add-product',
         isEditingMode: false,
-        isAuthenticated: request.isLoggedIn
+        isAuthenticated: request.session.isLoggedIn
     })
 }
 
@@ -52,7 +52,7 @@ export const postAddProduct = async (
             price: request.body.price,
             description: request.body.description,
             imageUrl: request.body.imageUrl,
-            createdByUserId: request.user._id
+            createdByUserId: request.session.user._id
         })
         await newProduct.save()
         response.redirect('/')
@@ -74,7 +74,7 @@ export const getEditProduct = async (
             routePath: '/admin/edit-product',
             isEditingMode: true,
             productToEdit: productToEdit,
-            isAuthenticated: request.isLoggedIn
+            isAuthenticated: request.session.isLoggedIn
         })
     } catch (error) {
         next(error)
@@ -110,7 +110,7 @@ export const getProducts = async (
             productList: await Product.find(),
             pageTitle: 'Admin Products',
             routePath: '/admin/products',
-            isAuthenticated: request.isLoggedIn
+            isAuthenticated: request.session.isLoggedIn
         })
     } catch (error) {
         next(error)
@@ -125,7 +125,9 @@ export const postDeleteProduct = async (
     try {
         const productId = request.params.productId
         await Product.findByIdAndRemove(productId)
-        await request.user.deleteCartItem(productId)
+        const user = await User.findById(request.session.user._id).orFail().exec()
+        //TODO: When a product is deleted, it needs to be deleted from the carts of all users, not just this user.
+        await user.deleteCartItem(productId)
         response.redirect('/admin/products')
     } catch (error) {
         next(error)

@@ -9,13 +9,13 @@
             <li class="main-header__item">
                 <a class="<%= routePath === '/products' ? 'active' : '' %>" href="/products">Products</a>
             </li>
+            <% if (isAuthenticated) { %> 
             <li class="main-header__item">
                 <a class="<%= routePath === '/cart' ? 'active' : '' %>" href="/cart">Cart</a>
             </li>
             <li class="main-header__item">
                 <a class="<%= routePath === '/orders' ? 'active' : '' %>" href="/orders">Orders</a>
             </li>
-            <% if (isAuthenticated) { %> 
             <li class="main-header__item">
                 <a class="<%= routePath === '/admin/add-product' ? 'active' : '' %>" href="/admin/add-product">Add Product</a>
             </li>

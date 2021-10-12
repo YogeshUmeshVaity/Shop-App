@@ -71,3 +71,10 @@ export const postLogin = async (
         next(error)
     }
 }
+
+export const postLogout = async (request: Request, response: Response): Promise<void> => {
+    request.session.destroy((error) => {
+        console.log(error)
+        response.redirect('/')
+    })
+}

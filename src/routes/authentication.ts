@@ -6,3 +6,5 @@ export const authRoutes = express.Router()
 authRoutes.get('/login', authController.getLogin)
 
 authRoutes.post('/login', authController.postLogin)
+
+authRoutes.post('/logout', authController.postLogout)

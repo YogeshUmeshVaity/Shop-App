@@ -66,6 +66,10 @@ export const postLogin = async (
         // this single request.
         request.session.user = await UserModel.findById('6127bd9d204a47128947a07d').orFail().exec()
         request.session.isLoggedIn = true
+        // Calling the save() here ensures that the session is stored in the database. It's not
+        // required to call save() here, but awaiting for the save ensures that we get redirected
+        // only when the session is stored.
+        await request.session.save()
         response.redirect('/')
     } catch (error) {
         next(error)

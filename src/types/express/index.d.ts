@@ -1,4 +1,5 @@
-import { DocumentType } from '@typegoose/typegoose'
+import { DocumentType, getModelForClass } from '@typegoose/typegoose'
+import { GetTypeReturn } from '@typegoose/typegoose/lib/types'
 import { UserModel } from '../../models/User'
 import { User } from '../models/User'
 
@@ -14,7 +15,7 @@ declare global {
         export interface Request {
             // TODO: These properties already exist in session object. Remove them from here.
             isLoggedIn: boolean
-            user?: User
+            user?: DocumentType<User>
         }
     }
 }

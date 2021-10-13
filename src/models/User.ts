@@ -14,13 +14,13 @@ export class User {
     cart!: Cart
 
     // Instance method docs: https://typegoose.github.io/typegoose/docs/guides/quick-start-guide/#instance-methods
-    public static async addToCart(
-        user: DocumentType<User>,
+    public async addToCart(
+        this: DocumentType<User>,
         product: DocumentType<Product>,
         newQuantity: number
     ): Promise<void> {
-        const updatedCartItems = user.cart.items
-        const existingItemIndex = user.cart.items.findIndex(
+        const updatedCartItems = this.cart.items
+        const existingItemIndex = this.cart.items.findIndex(
             (item) => item.productId?.toString() === product._id.toString()
         )
         console.log('Existing Item Index', existingItemIndex)
@@ -31,10 +31,10 @@ export class User {
         }
         const updatedCart: Cart = { items: updatedCartItems, totalPrice: 0 }
         console.log('Updated cart:', updatedCart)
-        user.cart = updatedCart
-        console.log('This user cart', user.cart)
+        this.cart = updatedCart
+        console.log('This user cart', this.cart)
         // this.save() doesn't work for some reason
-        await getModelForClass(User).findByIdAndUpdate({ _id: user._id }, { cart: updatedCart })
+        await getModelForClass(User).findByIdAndUpdate({ _id: this._id }, { cart: updatedCart })
     }
 
     public async deleteCartItem(this: DocumentType<User>, productId: string): Promise<void> {

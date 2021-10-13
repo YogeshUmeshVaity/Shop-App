@@ -8,9 +8,11 @@ export const createTestUser = async (
     next: NextFunction
 ): Promise<void> => {
     try {
+        if (!request.session.user) {
+            return next()
+        }
         // This user along with its cart with items should be manually created directly in the database.
-        request.user = await User.findById('6127bd9d204a47128947a07d')
-        // console.log('Current user: ', request.user)
+        request.user = await User.findById(request.session.user._id).orFail().exec()
         next()
     } catch (error) {
         next(error)

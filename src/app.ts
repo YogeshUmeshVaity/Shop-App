@@ -9,7 +9,7 @@ import mongoose from 'mongoose'
 
 // Controllers
 import * as errorController from './controllers/error'
-import { createTestUser as initializeTestUser } from './controllers/admin'
+import { createTestUser as initializeUser } from './controllers/admin'
 import { createTestUser1 as createTestUser } from './controllers/admin'
 import { initializeSession } from './controllers/authentication'
 
@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: false }))
 //app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false }))
 app.use(initializeSession)
 
-// app.use(initializeTestUser)
+app.use(initializeUser)
 
 // Used for serving public static files.
 app.use(express.static(path.join(__dirname, 'public')))

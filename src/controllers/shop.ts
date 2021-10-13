@@ -63,8 +63,9 @@ export const getCart = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const user = await User.findById(request.session.user._id).orFail().exec()
-        const userWithCartProducts = await user.populate('cart.items.productId').execPopulate()
+        const userWithCartProducts = await request.user
+            .populate('cart.items.productId')
+            .execPopulate()
         console.log('User with Cart Products', userWithCartProducts.cart)
         response.render('shop/cart', {
             pageTitle: 'Your Cart',
@@ -84,11 +85,9 @@ export const postCart = async (
 ): Promise<void> => {
     const newQuantity = 1
     const productId = request.body.productId
-    
     try {
-        const user = await User.findById(request.session.user._id).orFail().exec()
         const product = await Product.findById(productId).orFail().exec()
-        await User.addToCart(user, product, newQuantity)
+        await request.user.addToCart(product, newQuantity)
         response.redirect('/cart')
     } catch (error) {
         next(error)
@@ -103,8 +102,7 @@ export const deleteCartItem = async (
     const productId: string = request.body.itemId
     console.log('Product to delete ID', productId)
     try {
-        const user = await User.findById(request.session.user._id).orFail().exec()
-        await user.deleteCartItem(productId)
+        await request.user.deleteCartItem(productId)
         response.redirect('/cart')
     } catch (error) {
         next(error)
@@ -117,8 +115,7 @@ export const postOrder = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const user = await User.findById(request.session.user._id).orFail().exec()
-        await Order.addOrder(user)
+        await Order.addOrder(request.user)
         response.redirect('/orders')
     } catch (error) {
         next(error)
@@ -131,7 +128,7 @@ export const getOrders = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const orders = await Order.find({ 'user._id': request.session.user._id })
+        const orders = await Order.find({ 'user._id': request.user._id })
         response.render('shop/orders', {
             pageTitle: 'Your Orders',
             routePath: '/orders',

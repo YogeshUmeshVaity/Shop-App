@@ -9,6 +9,9 @@ export class User {
     @prop({ required: true })
     email!: string
 
+    @prop({ required: true })
+    password!: string
+
     // This is an example of a single SubDocument
     @prop({ required: true, _id: false })
     cart!: Cart

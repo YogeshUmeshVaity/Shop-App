@@ -44,7 +44,7 @@ app.use(errorController.get404)
 mongoose
     .connect(databaseUrl(), connectOptions)
     .then(() => {
-        createTestUser()
+        // createTestUser()
         app.listen(3000)
     })
     .catch((error) => console.log(error))

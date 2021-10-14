@@ -3,7 +3,7 @@ import session from 'express-session'
 //import { sessionOptions } from '../util/database'
 import mongoDbSession from 'connect-mongodb-session'
 import { databaseUrl } from '../util/database'
-import { User, UserModel } from '../models/User'
+import { UserModel as User } from '../models/User'
 import { DocumentType } from '@typegoose/typegoose'
 
 /**
@@ -43,7 +43,6 @@ export const getLogin = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-
     // If you click login menu and then click login button, this will be `true` (user 1)
     // Now if you open this website and click login menu, this will be 'false' (user 2)
     // This is how we distinguish different users.
@@ -64,7 +63,7 @@ export const postLogin = async (
     try {
         // By setting the user on the session, we share it across requests and is not just valid for
         // this single request.
-        request.session.user = await UserModel.findById('6127bd9d204a47128947a07d').orFail().exec()
+        request.session.user = await User.findById('6127bd9d204a47128947a07d').orFail().exec()
         request.session.isLoggedIn = true
         // Calling the save() here ensures that the session is stored in the database. It's not
         // required to call save() here, but awaiting for the save ensures that we get redirected
@@ -100,5 +99,29 @@ export const postSignup = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const { name, email, password, confirmPassword } = request.body
+    try {
+        const existingUser = await User.findOne({ email: email })
+        if (existingUser) {
+            return response.redirect('/signup')
+        }
+        await createNewUser(name, email, password)
+        response.redirect('/login')
+    } catch (error) {
+        next(error)
+    }
+}
 
+async function createNewUser(name: string, email: string, password: string) {
+    const newUser = new User({
+        name,
+        email,
+        password,
+        cart: {
+            items: [],
+            totalPrice: 0
+        }
+    })
+
+    await newUser.save()
 }

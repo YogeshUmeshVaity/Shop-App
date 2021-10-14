@@ -5,6 +5,7 @@ import mongoDbSession from 'connect-mongodb-session'
 import { databaseUrl } from '../util/database'
 import { UserModel as User } from '../models/User'
 import { DocumentType } from '@typegoose/typegoose'
+import bcrypt from 'bcryptjs'
 
 /**
  * Fetches session secrete from .env file and initializes the express-session.
@@ -105,18 +106,19 @@ export const postSignup = async (
         if (existingUser) {
             return response.redirect('/signup')
         }
-        await createNewUser(name, email, password)
+        const hashedPassword = await bcrypt.hash(password, 12)
+        await createNewUser(name, email, hashedPassword)
         response.redirect('/login')
     } catch (error) {
         next(error)
     }
 }
 
-async function createNewUser(name: string, email: string, password: string) {
+async function createNewUser(name: string, email: string, hashedPassword: string) {
     const newUser = new User({
         name,
         email,
-        password,
+        password: hashedPassword,
         cart: {
             items: [],
             totalPrice: 0

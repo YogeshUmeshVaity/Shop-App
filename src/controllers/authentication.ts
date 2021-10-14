@@ -82,3 +82,23 @@ export const postLogout = async (request: Request, response: Response): Promise<
         response.redirect('/')
     })
 }
+
+export const getSignup = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    response.render('authentication/signup', {
+        pageTitle: 'Signup',
+        routePath: '/signup',
+        isAuthenticated: request.session.isLoggedIn
+    })
+}
+
+export const postSignup = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+
+}

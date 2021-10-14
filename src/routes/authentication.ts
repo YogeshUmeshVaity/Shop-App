@@ -8,3 +8,7 @@ authRoutes.get('/login', authController.getLogin)
 authRoutes.post('/login', authController.postLogin)
 
 authRoutes.post('/logout', authController.postLogout)
+
+authRoutes.get('/signup', authController.getSignup)
+
+authRoutes.post('/signup', authController.postSignup)

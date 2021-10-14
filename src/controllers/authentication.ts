@@ -3,9 +3,13 @@ import session from 'express-session'
 //import { sessionOptions } from '../util/database'
 import mongoDbSession from 'connect-mongodb-session'
 import { databaseUrl } from '../util/database'
-import { UserModel as User } from '../models/User'
+import { User, UserModel } from '../models/User'
 import { DocumentType } from '@typegoose/typegoose'
 import bcrypt from 'bcryptjs'
+import { BeAnObject } from '@typegoose/typegoose/lib/types'
+import { ParamsDictionary } from 'express-serve-static-core'
+import { QueryWithHelpers } from 'mongoose'
+import { ParsedQs } from 'qs'
 
 /**
  * Fetches session secrete from .env file and initializes the express-session.
@@ -61,16 +65,21 @@ export const postLogin = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const email = request.body.email
+    const providedPassword = request.body.password
     try {
-        // By setting the user on the session, we share it across requests and is not just valid for
-        // this single request.
-        request.session.user = await User.findById('6127bd9d204a47128947a07d').orFail().exec()
-        request.session.isLoggedIn = true
-        // Calling the save() here ensures that the session is stored in the database. It's not
-        // required to call save() here, but awaiting for the save ensures that we get redirected
-        // only when the session is stored.
-        await request.session.save()
-        response.redirect('/')
+        const existingUser = await UserModel.findOne({ email })
+        if (!existingUser) {
+            return response.redirect('/login')
+        }
+
+        const isMatch = await matchPasswords(providedPassword, existingUser.password)
+        if (isMatch) {
+            await saveUserToSession(request, existingUser)
+            response.redirect('/')
+        } else {
+            response.redirect('/login')
+        }
     } catch (error) {
         next(error)
     }
@@ -102,7 +111,7 @@ export const postSignup = async (
 ): Promise<void> => {
     const { name, email, password, confirmPassword } = request.body
     try {
-        const existingUser = await User.findOne({ email: email })
+        const existingUser = await UserModel.findOne({ email: email })
         if (existingUser) {
             return response.redirect('/signup')
         }
@@ -114,8 +123,23 @@ export const postSignup = async (
     }
 }
 
+async function matchPasswords(providedPassword: string, existingPassword: string) {
+    return await bcrypt.compare(providedPassword, existingPassword)
+}
+
+async function saveUserToSession(request: Request, existingUser: DocumentType<User, BeAnObject>) {
+    // By setting the user on the session, we share it across requests and is not just valid for
+    // this single request.
+    request.session.user = existingUser
+    request.session.isLoggedIn = true
+    // Calling the save() here ensures that the session is stored in the database. It's not
+    // required to call save() here, but awaiting for the save ensures that we get redirected
+    // only when the session is stored.
+    await request.session.save()
+}
+
 async function createNewUser(name: string, email: string, hashedPassword: string) {
-    const newUser = new User({
+    const newUser = new UserModel({
         name,
         email,
         password: hashedPassword,

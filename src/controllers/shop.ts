@@ -56,13 +56,14 @@ export const getIndex = async (
     }
 }
 
-// TODO: App crashes after you navigate to cart when a product is deleted and while it's in the cart
 export const getCart = async (
     request: Request,
     response: Response,
     next: NextFunction
 ): Promise<void> => {
     try {
+        // TODO: App crashes after you navigate to cart when a product is deleted while it's still in the cart. 
+        // TODO: So, we should delete the product from cart when the it's deleted from the products collection.
         const userWithCartProducts = await request.user
             .populate('cart.items.productId')
             .execPopulate()

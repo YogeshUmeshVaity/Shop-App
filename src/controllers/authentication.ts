@@ -1,15 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
-//import { sessionOptions } from '../util/database'
 import mongoDbSession from 'connect-mongodb-session'
 import { databaseUrl } from '../util/database'
 import { User, UserModel } from '../models/User'
 import { DocumentType } from '@typegoose/typegoose'
 import bcrypt from 'bcryptjs'
 import { BeAnObject } from '@typegoose/typegoose/lib/types'
-import { ParamsDictionary } from 'express-serve-static-core'
-import { QueryWithHelpers } from 'mongoose'
-import { ParsedQs } from 'qs'
 
 /**
  * Fetches session secrete from .env file and initializes the express-session.

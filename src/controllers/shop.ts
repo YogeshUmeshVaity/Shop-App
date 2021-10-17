@@ -49,7 +49,8 @@ export const getIndex = async (
             productList: await Product.find(),
             pageTitle: 'Shop',
             routePath: '/',
-            isAuthenticated: request.session.isLoggedIn
+            isAuthenticated: request.session.isLoggedIn,
+            csrfToken: request.csrfToken()
         })
     } catch (error) {
         next(error)

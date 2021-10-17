@@ -1,5 +1,6 @@
 <% /* The form automatically creates an http request for us. */ %>
 <form action="/cart" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <button class="btn" type="submit">Add to Cart</button>
     <% /* For sending the productId. It should not be visible to the user. */ %> 
     <input type="hidden" name="productId" value="<%= product._id %>">

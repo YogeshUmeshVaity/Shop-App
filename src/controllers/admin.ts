@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { UserModel as User } from '../models/User'
 
-export const createTestUser = async (
+export const initializeUser = async (
     request: Request,
     response: Response,
     next: NextFunction
@@ -32,6 +32,12 @@ export const createTestUser1 = async (): Promise<void> => {
         })
         await user.save()
     }
+}
+
+export const addLocals = (request: Request, response: Response, next: NextFunction): void => {
+    response.locals.isAuthenticated = request.session.isLoggedIn
+    response.locals.csrfToken = request.csrfToken()
+    next()
 }
 
 export const getAddProduct = (request: Request, response: Response): void => {

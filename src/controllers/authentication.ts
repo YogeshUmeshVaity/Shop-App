@@ -51,8 +51,7 @@ export const getLogin = async (
 
     response.render('authentication/login', {
         pageTitle: 'Login',
-        routePath: '/login',
-        isAuthenticated: request.session.isLoggedIn
+        routePath: '/login'
     })
 }
 
@@ -95,8 +94,7 @@ export const getSignup = async (
 ): Promise<void> => {
     response.render('authentication/signup', {
         pageTitle: 'Signup',
-        routePath: '/signup',
-        isAuthenticated: request.session.isLoggedIn
+        routePath: '/signup'
     })
 }
 

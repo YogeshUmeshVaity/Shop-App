@@ -12,8 +12,7 @@ export const getProducts = async (
         response.render('shop/product-list', {
             productList: await Product.find(),
             pageTitle: 'All Products',
-            routePath: '/products',
-            isAuthenticated: request.session.isLoggedIn
+            routePath: '/products'
         })
     } catch (error) {
         next(error)
@@ -31,8 +30,7 @@ export const getProductDetails = async (
         response.render('shop/product-details', {
             product: requestedProduct,
             pageTitle: requestedProduct.title,
-            routePath: '/products',
-            isAuthenticated: request.session.isLoggedIn
+            routePath: '/products'
         })
     } catch (error) {
         next(error)
@@ -48,9 +46,7 @@ export const getIndex = async (
         response.render('shop/index', {
             productList: await Product.find(),
             pageTitle: 'Shop',
-            routePath: '/',
-            isAuthenticated: request.session.isLoggedIn,
-            csrfToken: request.csrfToken()
+            routePath: '/'
         })
     } catch (error) {
         next(error)
@@ -72,8 +68,7 @@ export const getCart = async (
         response.render('shop/cart', {
             pageTitle: 'Your Cart',
             routePath: '/cart',
-            cartItems: userWithCartProducts.cart.items,
-            isAuthenticated: request.session.isLoggedIn
+            cartItems: userWithCartProducts.cart.items
         })
     } catch (error) {
         next(error)
@@ -134,8 +129,7 @@ export const getOrders = async (
         response.render('shop/orders', {
             pageTitle: 'Your Orders',
             routePath: '/orders',
-            orders: orders,
-            isAuthenticated: request.session.isLoggedIn
+            orders: orders
         })
     } catch (error) {
         next(error)
@@ -145,7 +139,6 @@ export const getOrders = async (
 export const getCheckout = (request: Request, response: Response): void => {
     response.render('shop/checkout', {
         pageTitle: 'Checkout',
-        routePath: '/checkout',
-        isAuthenticated: request.session.isLoggedIn
+        routePath: '/checkout'
     })
 }

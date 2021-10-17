@@ -44,15 +44,11 @@ export const getLogin = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // If you click login menu and then click login button, this will be `true` (user 1)
-    // Now if you open this website and click login menu, this will be 'false' (user 2)
-    // This is how we distinguish different users.
-    console.log(request.session.isLoggedIn)
-
+    const errorMessage = extractErrorMessage(request)
     response.render('authentication/login', {
         pageTitle: 'Login',
         routePath: '/login',
-        errorMessage: request.flash('error')
+        errorMessage: errorMessage
     })
 }
 
@@ -75,6 +71,7 @@ export const postLogin = async (
             await saveUserToSession(request, existingUser)
             response.redirect('/')
         } else {
+            request.flash('error', 'Invalid email or password.')
             response.redirect('/login')
         }
     } catch (error) {
@@ -146,4 +143,14 @@ async function createNewUser(name: string, email: string, hashedPassword: string
     })
 
     await newUser.save()
+}
+
+// Extract the error message from the array.
+function extractErrorMessage(request: Request): string | null {
+    const message = request.flash('error')
+    if (message.length > 0) {
+        return message[0]
+    } else {
+        return null
+    }
 }

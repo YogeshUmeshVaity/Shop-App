@@ -51,7 +51,8 @@ export const getLogin = async (
 
     response.render('authentication/login', {
         pageTitle: 'Login',
-        routePath: '/login'
+        routePath: '/login',
+        errorMessage: request.flash('error')
     })
 }
 
@@ -65,6 +66,7 @@ export const postLogin = async (
     try {
         const existingUser = await UserModel.findOne({ email })
         if (!existingUser) {
+            request.flash('error', 'Invalid email or password.')
             return response.redirect('/login')
         }
 

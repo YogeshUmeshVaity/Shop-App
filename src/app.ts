@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import { connectOptions, databaseUrl } from './util/database'
 import mongoose from 'mongoose'
 import csrf from 'csurf'
+import flash from 'connect-flash'
 
 // Controllers
 import * as errorController from './controllers/error'
@@ -33,9 +34,13 @@ app.use(initializeSession)
 // Must be used right after initializing the session.
 app.use(csrfProtection)
 
+// Used for flashing the messages for the user.
+app.use(flash())
+
+// Add user object on the request object.
 app.use(initializeUser)
 
-// Adds frequently 
+// Adds frequently required data all at once to the view for every request.
 app.use(addLocals)
 
 // Used for serving public static files.

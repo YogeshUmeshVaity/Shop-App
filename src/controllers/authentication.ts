@@ -91,9 +91,11 @@ export const getSignup = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const errorMessage = extractErrorMessage(request)
     response.render('authentication/signup', {
         pageTitle: 'Signup',
-        routePath: '/signup'
+        routePath: '/signup',
+        errorMessage: errorMessage
     })
 }
 
@@ -106,6 +108,10 @@ export const postSignup = async (
     try {
         const existingUser = await UserModel.findOne({ email: email })
         if (existingUser) {
+            request.flash(
+                'error',
+                'A user with this email already exists. Please, use different email.'
+            )
             return response.redirect('/signup')
         }
         const hashedPassword = await bcrypt.hash(password, 12)

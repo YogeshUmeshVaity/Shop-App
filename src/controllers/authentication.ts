@@ -116,6 +116,9 @@ export const postSignup = async (
         }
         const hashedPassword = await bcrypt.hash(password, 12)
         await createNewUser(name, email, hashedPassword)
+        // In a very large scale projects where there are huge amount of users signing up,
+        // this approach may not be useful, because this statement blocks the execution before
+        // they are redirected to the login page.
         await sendWelcomeEmail(email)
         response.redirect('/login')
     } catch (error) {

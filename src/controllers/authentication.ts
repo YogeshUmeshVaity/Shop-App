@@ -116,10 +116,22 @@ export const postSignup = async (
         }
         const hashedPassword = await bcrypt.hash(password, 12)
         await createNewUser(name, email, hashedPassword)
+        await sendWelcomeEmail(email)
         response.redirect('/login')
     } catch (error) {
         next(error)
     }
+}
+
+//TODO: Need to approve account on postmark website to be able to send emails.
+// For that we need a company's domain name. Uncomment the following once the account is approved.
+async function sendWelcomeEmail(email: string) {
+    // await emailClient.sendEmail({
+    //     From: 'yiwaso1519@otozuz.com',
+    //     To: email,
+    //     Subject: 'Welcome to Hawshop!',
+    //     TextBody: 'Signup successful on Hawshop.'
+    // })
 }
 
 async function matchPasswords(providedPassword: string, existingPassword: string) {

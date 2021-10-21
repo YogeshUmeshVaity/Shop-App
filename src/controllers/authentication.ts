@@ -175,6 +175,32 @@ export const postResetPassword = async (
     }
 }
 
+export const getNewPassword = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const { token } = request.params
+    try {
+        const user = await UserModel.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpiration: { $gt: new Date(Date.now()) }
+        })
+        if (!user) {
+            throw Error('Invalid password reset token')
+        }
+        const errorMessage = extractErrorMessage(request)
+        response.render('authentication/new-password', {
+            pageTitle: 'New Password',
+            routePath: '/new-password',
+            errorMessage: errorMessage,
+            userId: user._id.toString()
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
 async function saveTokenToDb(user: DocumentType<User, BeAnObject>, token: string) {
     user.resetPasswordToken = token
     user.resetPasswordExpiration = new Date(Date.now() + ONE_HOUR)

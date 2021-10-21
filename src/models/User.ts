@@ -12,6 +12,12 @@ export class User {
     @prop({ required: true })
     password!: string
 
+    @prop({ required: false })
+    resetPasswordToken?: string
+
+    @prop({ required: false })
+    resetPasswordExpiration?: Date
+
     // This is an example of a single SubDocument
     @prop({ required: true, _id: false })
     cart!: Cart

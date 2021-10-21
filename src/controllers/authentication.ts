@@ -6,6 +6,14 @@ import { User, UserModel } from '../models/User'
 import { DocumentType } from '@typegoose/typegoose'
 import bcrypt from 'bcryptjs'
 import { BeAnObject } from '@typegoose/typegoose/lib/types'
+import crypto from 'crypto'
+import { promisify } from 'util'
+import { PasswordResetError } from '../errors/PasswordResetError'
+import { Date } from 'mongoose'
+import { emailClient } from '../util/emailClient'
+
+const randomBytesAsync = promisify(crypto.randomBytes)
+const ONE_HOUR = 3600000
 
 /**
  * Fetches session secrete from .env file and initializes the express-session.
@@ -106,7 +114,7 @@ export const postSignup = async (
 ): Promise<void> => {
     const { name, email, password, confirmPassword } = request.body
     try {
-        const existingUser = await UserModel.findOne({ email: email })
+        const existingUser = await UserModel.findOne({ email: email }).exec()
         if (existingUser) {
             request.flash(
                 'error',
@@ -126,15 +134,87 @@ export const postSignup = async (
     }
 }
 
+export const getResetPassword = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const errorMessage = extractErrorMessage(request)
+    response.render('authentication/reset-password', {
+        pageTitle: 'Reset Password',
+        routePath: '/reset-password',
+        errorMessage: errorMessage
+    })
+}
+
+export const postResetPassword = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const { email } = request.body
+    console.log('email: ', email)
+    try {
+        // Token is later used for confirming that the password reset link was really sent by us.
+        const token = await createResetToken()
+        const user = await UserModel.findOne({ email }).exec()
+        if (!user) {
+            request.flash('error', 'No account was found with the provided email.')
+            return response.redirect('/reset-password')
+        }
+
+        await saveTokenToDb(user, token)
+        sendPasswordResetEmail(user.email, token)
+        response.redirect('/')
+    } catch (error) {
+        if (error instanceof PasswordResetError) {
+            return response.redirect('/reset-password')
+        } else {
+            next(error)
+        }
+    }
+}
+
+async function saveTokenToDb(user: DocumentType<User, BeAnObject>, token: string) {
+    user.resetPasswordToken = token
+    user.resetPasswordExpiration = new Date(Date.now() + ONE_HOUR)
+    await user.save()
+}
+
+async function createResetToken(): Promise<string> {
+    let buffer: Buffer
+    try {
+        buffer = await randomBytesAsync(32)
+    } catch (error) {
+        console.log(error)
+        // TODO: Not sure if it's a good idea not passing the original error object.
+        throw new PasswordResetError('Error creating the password reset token.')
+    }
+    return buffer.toString('hex')
+}
+
 //TODO: Need to approve account on postmark website to be able to send emails.
 // For that we need a company's domain name. Uncomment the following once the account is approved.
 async function sendWelcomeEmail(email: string) {
     // await emailClient.sendEmail({
-    //     From: 'yiwaso1519@otozuz.com',
+    //     From: 'ledax86121@forfity.com',
     //     To: email,
     //     Subject: 'Welcome to Hawshop!',
     //     TextBody: 'Signup successful on Hawshop.'
     // })
+}
+
+// TODO: extract the localhost url to the environment variable, so you can easily set the production url.
+async function sendPasswordResetEmail(email: string, token: string) {
+    await emailClient.sendEmail({
+        From: 'ledax86121@forfity.com',
+        To: email,
+        Subject: 'Password reset at Hawshop.',
+        HtmlBody: `
+            <p>You requested a password reset.</p>
+            <p>Click this <a href="http://localhost:3000/reset-password/${token}">link</a> to set a new password.</p>
+        `
+    })
 }
 
 async function matchPasswords(providedPassword: string, existingPassword: string) {

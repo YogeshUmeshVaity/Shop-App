@@ -87,18 +87,30 @@ export const getEditProduct = async (
     }
 }
 
+/**
+ * We use the findOneAndUpdate() instead of first finding the document and then updating it, because
+ * with the exception of an unindexed upsert, findOneAndUpdate() is atomic. That means you can 
+ * assume the document doesn't change between when MongoDB finds the document and when it updates 
+ * the document, unless you're doing an upsert.
+ *
+ * Adding the extra condition of createdByUserId ensures that only the user who created this product
+ * (currently logged in user) can edit it.
+ */
 export const postEditProduct = async (
     request: Request,
     response: Response,
     next: NextFunction
 ): Promise<void> => {
     try {
-        const result = await Product.findByIdAndUpdate(request.body.productId, {
-            title: request.body.title,
-            imageUrl: request.body.imageUrl,
-            description: request.body.description,
-            price: request.body.price
-        })
+        const result = await Product.findOneAndUpdate(
+            { _id: request.body.productId, createdByUserId: request.user._id },
+            {
+                title: request.body.title,
+                imageUrl: request.body.imageUrl,
+                description: request.body.description,
+                price: request.body.price
+            }
+        )
         // TODO: handleResult(result)
         return response.redirect('/admin/products')
     } catch (error) {
@@ -106,9 +118,6 @@ export const postEditProduct = async (
     }
 }
 
-/**
- * Shows only the products created by the currently logged in user.
- */
 export const getProducts = async (
     request: Request,
     response: Response,

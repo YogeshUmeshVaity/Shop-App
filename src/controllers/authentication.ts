@@ -147,6 +147,12 @@ export const getResetPassword = async (
     })
 }
 
+/**
+ * Token is later used for confirming that the password reset link we sent in the email was really
+ * sent by us. This is like the csrf protection. We also save the expiry time in the database for
+ * this token. Expiry time ensures that this token is only valid in a certain time frame better for
+ * security.
+ */
 export const postResetPassword = async (
     request: Request,
     response: Response,
@@ -155,7 +161,6 @@ export const postResetPassword = async (
     const { email } = request.body
     console.log('email: ', email)
     try {
-        // Token is later used for confirming that the password reset link was really sent by us.
         const token = await createResetToken()
         const user = await UserModel.findOne({ email }).exec()
         if (!user) {
@@ -175,6 +180,11 @@ export const postResetPassword = async (
     }
 }
 
+/**
+ * In addition to the token, we also pass the userId. This makes sure that the attackers can't
+ * automate trying random tokens in the address bar and reach the new password page. They also need
+ * userId.
+ */
 export const getNewPassword = async (
     request: Request,
     response: Response,
@@ -203,9 +213,6 @@ export const postNewPassword = async (
 ): Promise<void> => {
     const { userId, newPassword, resetPasswordToken } = request.body
     try {
-        console.log(`
-            userId: ${userId}, newPassword: ${newPassword}, resetToken: ${resetPasswordToken}
-        `)
         const user = await verifyUserWithTokenAndId(resetPasswordToken, userId)
         const hashedPassword = await hashThe(newPassword)
         await savePasswordAndDeleteToken(user, hashedPassword)
@@ -249,7 +256,6 @@ async function verifyUserWithTokenAndId(
         resetPasswordExpiration: { $gt: new Date(Date.now()) },
         _id: userId
     })
-    console.log('user', user)
     if (!user) {
         throw Error('Invalid password reset token')
     }
@@ -294,6 +300,7 @@ async function sendPasswordResetEmail(email: string, token: string) {
         HtmlBody: `
             <p>You requested a password reset.</p>
             <p>Click this <a href="http://localhost:3000/reset-password/${token}">link</a> to set a new password.</p>
+            <p>For security reasons, this link is valid only for an hour.</p>
         `
     })
 }

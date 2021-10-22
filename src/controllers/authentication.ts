@@ -122,7 +122,7 @@ export const postSignup = async (
             )
             return response.redirect('/signup')
         }
-        const hashedPassword = await bcrypt.hash(password, 12)
+        const hashedPassword = await hashThe(password)
         await createNewUser(name, email, hashedPassword)
         // In a very large scale projects where there are huge amount of users signing up,
         // this approach may not be useful, because this statement blocks the execution before
@@ -180,25 +180,80 @@ export const getNewPassword = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const { token } = request.params
+    const { resetPasswordToken } = request.params
     try {
-        const user = await UserModel.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpiration: { $gt: new Date(Date.now()) }
-        })
-        if (!user) {
-            throw Error('Invalid password reset token')
-        }
+        const user = await verifyUserWithToken(resetPasswordToken)
         const errorMessage = extractErrorMessage(request)
         response.render('authentication/new-password', {
             pageTitle: 'New Password',
             routePath: '/new-password',
             errorMessage: errorMessage,
-            userId: user._id.toString()
+            userId: user._id.toString(),
+            resetPasswordToken: resetPasswordToken
         })
     } catch (error) {
         next(error)
     }
+}
+
+export const postNewPassword = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const { userId, newPassword, resetPasswordToken } = request.body
+    try {
+        console.log(`
+            userId: ${userId}, newPassword: ${newPassword}, resetToken: ${resetPasswordToken}
+        `)
+        const user = await verifyUserWithTokenAndId(resetPasswordToken, userId)
+        const hashedPassword = await hashThe(newPassword)
+        await savePasswordAndDeleteToken(user, hashedPassword)
+        response.redirect('/login')
+    } catch (error) {
+        next(error)
+    }
+}
+
+async function savePasswordAndDeleteToken(
+    user: DocumentType<User, BeAnObject>,
+    hashedPassword: string
+) {
+    user.password = hashedPassword
+    user.resetPasswordToken = undefined
+    user.resetPasswordExpiration = undefined
+    await user.save()
+}
+
+async function hashThe(password: string) {
+    return await bcrypt.hash(password, 12)
+}
+
+async function verifyUserWithToken(token: string): Promise<DocumentType<User, BeAnObject>> {
+    const user = await UserModel.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpiration: { $gt: new Date(Date.now()) }
+    })
+    if (!user) {
+        throw Error('Invalid password reset token')
+    }
+    return user
+}
+
+async function verifyUserWithTokenAndId(
+    token: string,
+    userId: string
+): Promise<DocumentType<User, BeAnObject>> {
+    const user = await UserModel.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpiration: { $gt: new Date(Date.now()) },
+        _id: userId
+    })
+    console.log('user', user)
+    if (!user) {
+        throw Error('Invalid password reset token')
+    }
+    return user
 }
 
 async function saveTokenToDb(user: DocumentType<User, BeAnObject>, token: string) {
@@ -233,7 +288,7 @@ async function sendWelcomeEmail(email: string) {
 // TODO: extract the localhost url to the environment variable, so you can easily set the production url.
 async function sendPasswordResetEmail(email: string, token: string) {
     await emailClient.sendEmail({
-        From: 'ledax86121@forfity.com',
+        From: 'xobay85451@ateampc.com',
         To: email,
         Subject: 'Password reset at Hawshop.',
         HtmlBody: `

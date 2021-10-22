@@ -17,6 +17,6 @@ authRoutes.get('/reset-password', authController.getResetPassword)
 
 authRoutes.post('/reset-password', authController.postResetPassword)
 
-authRoutes.get('/reset-password/:token', authController.getNewPassword)
+authRoutes.get('/reset-password/:resetPasswordToken', authController.getNewPassword)
 
-//authRoutes.post('/new-password', authController.postNewPassword)
+authRoutes.post('/new-password', authController.postNewPassword)

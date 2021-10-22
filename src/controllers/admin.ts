@@ -106,6 +106,9 @@ export const postEditProduct = async (
     }
 }
 
+/**
+ * Shows only the products created by the currently logged in user.
+ */
 export const getProducts = async (
     request: Request,
     response: Response,
@@ -113,7 +116,8 @@ export const getProducts = async (
 ): Promise<void> => {
     try {
         response.render('admin/product-list', {
-            productList: await Product.find(),
+            // Shows only the products created by the currently logged in user.
+            productList: await Product.find({ createdByUserId: request.user._id }),
             pageTitle: 'Admin Products',
             routePath: '/admin/products'
         })

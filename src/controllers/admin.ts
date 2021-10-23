@@ -142,7 +142,7 @@ export const postDeleteProduct = async (
 ): Promise<void> => {
     try {
         const productId = request.params.productId
-        await Product.findByIdAndRemove(productId)
+        await Product.deleteOne({ _id: productId, createdByUserId: request.user._id })
         const user = await User.findById(request.session.user._id).orFail().exec()
         //TODO: When a product is deleted, it needs to be deleted from the carts of all users, not just this user.
         await user.deleteCartItem(productId)

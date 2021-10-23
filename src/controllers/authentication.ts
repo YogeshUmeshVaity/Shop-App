@@ -9,8 +9,8 @@ import { BeAnObject } from '@typegoose/typegoose/lib/types'
 import crypto from 'crypto'
 import { promisify } from 'util'
 import { PasswordResetError } from '../errors/PasswordResetError'
-import { Date } from 'mongoose'
 import { emailClient } from '../util/emailClient'
+import { validationResult } from 'express-validator'
 
 const randomBytesAsync = promisify(crypto.randomBytes)
 const ONE_HOUR = 3600000
@@ -113,6 +113,15 @@ export const postSignup = async (
     next: NextFunction
 ): Promise<void> => {
     const { name, email, password, confirmPassword } = request.body
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        console.log(errors.array())
+        return response.status(422).render('authentication/signup', {
+            pageTitle: 'Signup',
+            routePath: '/signup',
+            errorMessage: errors.array()[0].msg
+        })
+    }
     try {
         const existingUser = await UserModel.findOne({ email: email }).exec()
         if (existingUser) {

@@ -1,6 +1,6 @@
 import express from 'express'
 import * as authController from '../controllers/authentication'
-import { check } from 'express-validator'
+import { body, check } from 'express-validator'
 
 export const authRoutes = express.Router()
 
@@ -15,6 +15,12 @@ authRoutes.get('/signup', authController.getSignup)
 authRoutes.post(
     '/signup',
     check('email').isEmail().withMessage('Please enter a valid email'),
+    check(
+        'password',
+        'Password should contain numbers, text and should be at least 5 characters long.'
+    )
+        .isLength({ min: 5 })
+        .isAlphanumeric(),
     authController.postSignup
 )
 

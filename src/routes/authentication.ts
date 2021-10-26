@@ -1,6 +1,7 @@
 import express from 'express'
 import * as authController from '../controllers/authentication'
 import { body, check } from 'express-validator'
+import { UserModel } from '../models/User'
 
 export const authRoutes = express.Router()
 
@@ -14,7 +15,18 @@ authRoutes.get('/signup', authController.getSignup)
 
 authRoutes.post(
     '/signup',
-    check('email').isEmail().withMessage('Please enter a valid email'),
+    check('email')
+        .isEmail()
+        .withMessage('Please enter a valid email')
+        .custom(async (value: string, { req }) => {
+            const existingUser = await UserModel.findOne({ email: value }).exec()
+            if (existingUser) {
+                throw new Error(
+                    'A user with this email already exists. Please, use different email.'
+                )
+            }
+            return true
+        }),
     body(
         'password',
         'Password should contain numbers, text and should be at least 5 characters long.'

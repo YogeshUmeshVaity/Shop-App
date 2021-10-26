@@ -112,7 +112,7 @@ export const postSignup = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const { name, email, password, confirmPassword } = request.body
+    const { name, email, password } = request.body
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         console.log(errors.array())
@@ -123,14 +123,6 @@ export const postSignup = async (
         })
     }
     try {
-        const existingUser = await UserModel.findOne({ email: email }).exec()
-        if (existingUser) {
-            request.flash(
-                'error',
-                'A user with this email already exists. Please, use different email.'
-            )
-            return response.redirect('/signup')
-        }
         const hashedPassword = await hashThe(password)
         await createNewUser(name, email, hashedPassword)
         // In a very large scale projects where there are huge amount of users signing up,

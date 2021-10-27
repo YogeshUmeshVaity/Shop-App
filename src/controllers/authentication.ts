@@ -112,7 +112,8 @@ export const getSignup = async (
     response.render('authentication/signup', {
         pageTitle: 'Signup',
         routePath: '/signup',
-        errorMessage: errorMessage
+        errorMessage: errorMessage,
+        oldInput: { name: '', email: '', password: '', confirmPassword: '' }
     })
 }
 
@@ -121,14 +122,15 @@ export const postSignup = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const { name, email, password } = request.body
+    const { name, email, password, confirmPassword } = request.body
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         console.log(errors.array())
         return response.status(422).render('authentication/signup', {
             pageTitle: 'Signup',
             routePath: '/signup',
-            errorMessage: errors.array()[0].msg
+            errorMessage: errors.array()[0].msg,
+            oldInput: { name, email, password, confirmPassword }
         })
     }
     try {

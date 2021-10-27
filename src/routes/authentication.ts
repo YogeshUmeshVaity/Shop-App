@@ -7,7 +7,17 @@ export const authRoutes = express.Router()
 
 authRoutes.get('/login', authController.getLogin)
 
-authRoutes.post('/login', authController.postLogin)
+/**
+ * The length check should be the same (5 here) as specified in the check of sign-up route.
+ */
+authRoutes.post(
+    '/login',
+    [
+        body('email').isEmail().withMessage('Please enter a valid email.'),
+        body('password', 'Please enter a valid password.').isLength({ min: 5 }).isAlphanumeric()
+    ],
+    authController.postLogin
+)
 
 authRoutes.post('/logout', authController.postLogout)
 
@@ -15,9 +25,9 @@ authRoutes.get('/signup', authController.getSignup)
 
 authRoutes.post(
     '/signup',
-    check('email')
+    body('email')
         .isEmail()
-        .withMessage('Please enter a valid email')
+        .withMessage('Please enter a valid email.')
         .custom(async (value: string, { req }) => {
             const existingUser = await UserModel.findOne({ email: value }).exec()
             if (existingUser) {

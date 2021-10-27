@@ -113,7 +113,8 @@ export const getSignup = async (
         pageTitle: 'Signup',
         routePath: '/signup',
         errorMessage: errorMessage,
-        oldInput: { name: '', email: '', password: '', confirmPassword: '' }
+        oldInput: { name: '', email: '', password: '', confirmPassword: '' },
+        validationErrors: []
     })
 }
 
@@ -130,7 +131,8 @@ export const postSignup = async (
             pageTitle: 'Signup',
             routePath: '/signup',
             errorMessage: errors.array()[0].msg,
-            oldInput: { name, email, password, confirmPassword }
+            oldInput: { name, email, password, confirmPassword },
+            validationErrors: errors.array()
         })
     }
     try {

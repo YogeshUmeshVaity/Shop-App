@@ -25,6 +25,7 @@ authRoutes.get('/signup', authController.getSignup)
 
 authRoutes.post(
     '/signup',
+    body('name').notEmpty().withMessage('Name is required.'),
     body('email')
         .isEmail()
         .withMessage('Please enter a valid email.')

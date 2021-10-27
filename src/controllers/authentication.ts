@@ -56,7 +56,9 @@ export const getLogin = async (
     response.render('authentication/login', {
         pageTitle: 'Login',
         routePath: '/login',
-        errorMessage: errorMessage
+        errorMessage: errorMessage,
+        oldInput: { email: '', password: '' },
+        validationErrors: []
     })
 }
 
@@ -73,14 +75,23 @@ export const postLogin = async (
         return response.status(422).render('authentication/login', {
             pageTitle: 'Login',
             routePath: '/login',
-            errorMessage: errors.array()[0].msg
+            errorMessage: errors.array()[0].msg,
+            oldInput: { email: email, password: providedPassword },
+            validationErrors: errors.array()
         })
     }
     try {
         const existingUser = await UserModel.findOne({ email })
         if (!existingUser) {
-            request.flash('error', 'Invalid email or password.')
-            return response.redirect('/login')
+            return response.status(422).render('authentication/login', {
+                pageTitle: 'Login',
+                routePath: '/login',
+                errorMessage: 'Invalid email or password.',
+                oldInput: { email: email, password: providedPassword },
+                validationErrors: [
+                    /* { param: 'email', OR param: 'password' } */
+                ]
+            })
         }
 
         const isMatch = await matchPasswords(providedPassword, existingUser.password)
@@ -88,8 +99,15 @@ export const postLogin = async (
             await saveUserToSession(request, existingUser)
             response.redirect('/')
         } else {
-            request.flash('error', 'Invalid email or password.')
-            response.redirect('/login')
+            response.status(422).render('authentication/login', {
+                pageTitle: 'Login',
+                routePath: '/login',
+                errorMessage: 'Invalid email or password.',
+                oldInput: { email: email, password: providedPassword },
+                validationErrors: [
+                    /* { param: 'email', OR param: 'password' } */
+                ]
+            })
         }
     } catch (error) {
         next(error)

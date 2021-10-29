@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { UserModel as User } from '../models/User'
-import { validationResult } from 'express-validator'
 
 export const initializeUser = async (
     request: Request,
@@ -57,23 +56,6 @@ export const postAddProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const errors = validationResult(request)
-    if (!errors.isEmpty()) {
-        return response.status(422).render('admin/edit-product', {
-            pageTitle: 'Add Product',
-            routePath: '/admin/add-product',
-            isEditingMode: false,
-            hasError: true,
-            errorMessage: errors.array()[0].msg,
-            validationErrors: errors.array(),
-            productToEdit: {
-                title: request.body.title,
-                price: request.body.price,
-                description: request.body.description,
-                imageUrl: request.body.imageUrl
-            }
-        })
-    }
     try {
         const newProduct = new Product({
             title: request.body.title,
@@ -113,8 +95,8 @@ export const getEditProduct = async (
 
 /**
  * We use the findOneAndUpdate() instead of first finding the document and then updating it, because
- * with the exception of an unindexed upsert, findOneAndUpdate() is atomic. That means you can 
- * assume the document doesn't change between when MongoDB finds the document and when it updates 
+ * with the exception of an unindexed upsert, findOneAndUpdate() is atomic. That means you can
+ * assume the document doesn't change between when MongoDB finds the document and when it updates
  * the document, unless you're doing an upsert.
  *
  * Adding the extra condition of createdByUserId ensures that only the user who created this product
@@ -125,26 +107,8 @@ export const postEditProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const errors = validationResult(request)
-    if (!errors.isEmpty()) {
-        return response.status(422).render('admin/edit-product', {
-            pageTitle: 'Edit Product',
-            routePath: '/admin/add-product',
-            isEditingMode: true,
-            hasError: true,
-            errorMessage: errors.array()[0].msg,
-            validationErrors: errors.array(),
-            productToEdit: {
-                _id: request.body.productId, // Makes sure _id is not lost when errors occur.
-                title: request.body.title,
-                price: request.body.price,
-                description: request.body.description,
-                imageUrl: request.body.imageUrl
-            }
-        })
-    }
     try {
-        const result = await Product.findOneAndUpdate(
+        await Product.findOneAndUpdate(
             { _id: request.body.productId, createdByUserId: request.user._id },
             {
                 title: request.body.title,
@@ -153,7 +117,6 @@ export const postEditProduct = async (
                 price: request.body.price
             }
         )
-        // TODO: handleResult(result)
         return response.redirect('/admin/products')
     } catch (error) {
         next(error)

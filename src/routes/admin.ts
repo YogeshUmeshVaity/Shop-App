@@ -3,7 +3,7 @@ import express from 'express'
 // Controllers
 import * as adminController from '../controllers/admin'
 import { authenticate } from '../middleware/authenticate'
-import * as validate from '../validators/admin'
+import { validatePostAddProduct, validatePostEditProduct } from '../validators/admin'
 
 export const adminRoutes = express.Router()
 
@@ -13,7 +13,7 @@ adminRoutes.get('/add-product', authenticate, adminController.getAddProduct)
 
 adminRoutes.post(
     '/add-product',
-    validate.addOREditProduct,
+    validatePostAddProduct,
     authenticate,
     adminController.postAddProduct
 )
@@ -22,7 +22,7 @@ adminRoutes.get('/edit-product/:productId', authenticate, adminController.getEdi
 
 adminRoutes.post(
     '/edit-product',
-    validate.addOREditProduct,
+    validatePostEditProduct,
     authenticate,
     adminController.postEditProduct
 )

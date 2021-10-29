@@ -7,22 +7,26 @@
     <%- include('../includes/navigation.ejs') %>
 
     <main>
+        <% /* 'if' check is needed in case there is no errorMessage (for first-time load). */ %>
+        <% if (errorMessage) { %>
+            <div class="user-message user-message--error"><%= errorMessage %></div>
+        <% } %>
         <form class="product-form" action="<% if (isEditingMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST">
             <div class="form-control">
                 <label for="title">Title</label>
-                <input type="text" name="title" id="title" value="<% if (isEditingMode) { %><%= productToEdit.title %><% } %>">
+                <input type="text" name="title" id="title" value="<% if (isEditingMode || hasError) { %><%= productToEdit.title %><% } %>">
             </div>
             <div class="form-control">
                 <label for="imageUrl">Image URL</label>
-                <input type="text" name="imageUrl" id="imageUrl" value="<% if (isEditingMode) { %><%= productToEdit.imageUrl %><% } %>">
+                <input type="text" name="imageUrl" id="imageUrl" value="<% if (isEditingMode || hasError) { %><%= productToEdit.imageUrl %><% } %>">
             </div>
             <div class="form-control">
                 <label for="price">Price</label>
-                <input type="number" name="price" id="price" step="0.01" value="<% if (isEditingMode) { %><%= productToEdit.price %><% } %>">
+                <input type="number" name="price" id="price" step="0.01" value="<% if (isEditingMode || hasError) { %><%= productToEdit.price %><% } %>">
             </div>
             <div class="form-control">
                 <label for="description">Description</label>
-                <textarea name="description" id="description" rows="5" ><% if (isEditingMode) { %><%= productToEdit.description %><% } %></textarea>
+                <textarea name="description" id="description" rows="5" ><% if (isEditingMode || hasError) { %><%= productToEdit.description %><% } %></textarea>
             </div>
             <% if (isEditingMode) { %>
                 <input type="hidden" name="productId" value="<%= productToEdit._id %>">

@@ -1,6 +1,6 @@
 import express from 'express'
 import * as authController from '../controllers/authentication'
-import { body, check } from 'express-validator'
+import { body } from 'express-validator'
 import { UserModel } from '../models/User'
 
 export const authRoutes = express.Router()

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { UserModel as User } from '../models/User'
+import { validationResult } from 'express-validator'
 
 export const initializeUser = async (
     request: Request,
@@ -44,7 +45,9 @@ export const getAddProduct = (request: Request, response: Response): void => {
     return response.render('admin/edit-product', {
         pageTitle: 'Add Product',
         routePath: '/admin/add-product',
-        isEditingMode: false
+        isEditingMode: false,
+        hasError: false,
+        errorMessage: null
     })
 }
 
@@ -53,6 +56,22 @@ export const postAddProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        return response.status(422).render('admin/edit-product', {
+            pageTitle: 'Add Product',
+            routePath: '/admin/add-product',
+            isEditingMode: false,
+            hasError: true,
+            errorMessage: errors.array()[0].msg,
+            productToEdit: {
+                title: request.body.title,
+                price: request.body.price,
+                description: request.body.description,
+                imageUrl: request.body.imageUrl
+            }
+        })
+    }
     try {
         const newProduct = new Product({
             title: request.body.title,
@@ -80,7 +99,9 @@ export const getEditProduct = async (
             pageTitle: 'Edit Product',
             routePath: '/admin/edit-product',
             isEditingMode: true,
-            productToEdit: productToEdit
+            productToEdit: productToEdit,
+            hasError: false,
+            errorMessage: null
         })
     } catch (error) {
         next(error)

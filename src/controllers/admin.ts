@@ -122,6 +122,23 @@ export const postEditProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        return response.status(422).render('admin/edit-product', {
+            pageTitle: 'Edit Product',
+            routePath: '/admin/add-product',
+            isEditingMode: true,
+            hasError: true,
+            errorMessage: errors.array()[0].msg,
+            productToEdit: {
+                _id: request.body.productId, // Makes sure _id is not lost when errors occur.
+                title: request.body.title,
+                price: request.body.price,
+                description: request.body.description,
+                imageUrl: request.body.imageUrl
+            }
+        })
+    }
     try {
         const result = await Product.findOneAndUpdate(
             { _id: request.body.productId, createdByUserId: request.user._id },

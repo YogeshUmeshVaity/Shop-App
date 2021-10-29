@@ -14,7 +14,7 @@ adminRoutes.get('/add-product', authenticate, adminController.getAddProduct)
 adminRoutes.post(
     '/add-product',
     [
-        body('title').isAlphanumeric().isLength({ min: 3 }).trim(),
+        body('title').isString().isLength({ min: 3 }).trim(),
         body('imageUrl').isURL(),
         body('price').isFloat(),
         body('description').isLength({ min: 8, max: 400 }).trim()
@@ -28,7 +28,7 @@ adminRoutes.get('/edit-product/:productId', authenticate, adminController.getEdi
 adminRoutes.post(
     '/edit-product',
     [
-        body('title').isAlphanumeric().isLength({ min: 3 }).trim(),
+        body('title').isString().isLength({ min: 3 }).trim(),
         body('imageUrl').isURL(),
         body('price').isFloat(),
         body('description').isLength({ min: 8, max: 400 }).trim()

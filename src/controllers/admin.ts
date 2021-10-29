@@ -47,7 +47,8 @@ export const getAddProduct = (request: Request, response: Response): void => {
         routePath: '/admin/add-product',
         isEditingMode: false,
         hasError: false,
-        errorMessage: null
+        errorMessage: null,
+        validationErrors: []
     })
 }
 
@@ -64,6 +65,7 @@ export const postAddProduct = async (
             isEditingMode: false,
             hasError: true,
             errorMessage: errors.array()[0].msg,
+            validationErrors: errors.array(),
             productToEdit: {
                 title: request.body.title,
                 price: request.body.price,
@@ -101,7 +103,8 @@ export const getEditProduct = async (
             isEditingMode: true,
             productToEdit: productToEdit,
             hasError: false,
-            errorMessage: null
+            errorMessage: null,
+            validationErrors: []
         })
     } catch (error) {
         next(error)
@@ -130,6 +133,7 @@ export const postEditProduct = async (
             isEditingMode: true,
             hasError: true,
             errorMessage: errors.array()[0].msg,
+            validationErrors: errors.array(),
             productToEdit: {
                 _id: request.body.productId, // Makes sure _id is not lost when errors occur.
                 title: request.body.title,

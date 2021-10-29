@@ -22,7 +22,9 @@
   outline-color: #00695c;
 }
 
-.form-control input.invalid {
+/* Red border for text input/textarea when validation fails. */
+.form-control input.invalid,
+.form-control textarea.invalid {
   border-color: red;
   border-width: 3px;
 }

@@ -141,18 +141,7 @@ export const postSignup = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const { name, email, password, confirmPassword } = request.body
-    const errors = validationResult(request)
-    if (!errors.isEmpty()) {
-        console.log(errors.array())
-        return response.status(422).render('authentication/signup', {
-            pageTitle: 'Signup',
-            routePath: '/signup',
-            errorMessage: errors.array()[0].msg,
-            oldInput: { name, email, password, confirmPassword },
-            validationErrors: errors.array()
-        })
-    }
+    const { name, email, password } = request.body
     try {
         const hashedPassword = await hashThe(password)
         await createNewUser(name, email, hashedPassword)

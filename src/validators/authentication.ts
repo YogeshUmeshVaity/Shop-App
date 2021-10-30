@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import { body, validationResult } from 'express-validator'
 import { UserModel } from '../models/User'
 
+const PASSWORD_MIN_LENGTH = 5
+
 const handleErrorsForPostSignup = (
     request: Request,
     response: Response,
@@ -55,4 +57,16 @@ export const validatePostSignup = [
             return true
         }),
     handleErrorsForPostSignup
+]
+
+/**
+ * The length check should be the same (5 here) as specified in the check of sign-up route.
+ */
+export const validatePostLogin = [
+    body('email', 'Please enter a valid email.').notEmpty().isEmail(),
+    body('password', 'Please enter a valid password.')
+        .isLength({ min: PASSWORD_MIN_LENGTH })
+        .isAlphanumeric()
+        .trim(),
+    body('email').if(body('email').isEmail()).normalizeEmail()
 ]

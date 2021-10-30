@@ -24,6 +24,27 @@ const handleErrorsForPostSignup = (
     next()
 }
 
+const handleErrorsForPostLogin = (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): void => {
+    const email = request.body.email
+    const providedPassword = request.body.password
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        console.log(errors.array())
+        return response.status(422).render('authentication/login', {
+            pageTitle: 'Login',
+            routePath: '/login',
+            errorMessage: errors.array()[0].msg,
+            oldInput: { email: email, password: providedPassword },
+            validationErrors: errors.array()
+        })
+    }
+    next()
+}
+
 export const validatePostSignup = [
     body('name').notEmpty().withMessage('Name is required.'),
     body('email')
@@ -68,5 +89,6 @@ export const validatePostLogin = [
         .isLength({ min: PASSWORD_MIN_LENGTH })
         .isAlphanumeric()
         .trim(),
-    body('email').if(body('email').isEmail()).normalizeEmail()
+    body('email').if(body('email').isEmail()).normalizeEmail(),
+    handleErrorsForPostLogin
 ]

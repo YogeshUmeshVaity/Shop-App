@@ -69,17 +69,6 @@ export const postLogin = async (
 ): Promise<void> => {
     const email = request.body.email
     const providedPassword = request.body.password
-    const errors = validationResult(request)
-    if (!errors.isEmpty()) {
-        console.log(errors.array())
-        return response.status(422).render('authentication/login', {
-            pageTitle: 'Login',
-            routePath: '/login',
-            errorMessage: errors.array()[0].msg,
-            oldInput: { email: email, password: providedPassword },
-            validationErrors: errors.array()
-        })
-    }
     try {
         const existingUser = await UserModel.findOne({ email })
         if (!existingUser) {

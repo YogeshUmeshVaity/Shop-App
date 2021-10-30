@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { UserModel as User } from '../models/User'
+import { DatabaseException } from '../exceptions/DatabaseException'
 
 export const initializeUser = async (
     request: Request,
@@ -11,7 +12,6 @@ export const initializeUser = async (
         if (!request.session.user) {
             return next()
         }
-        // This user along with its cart with items should be manually created directly in the database.
         request.user = await User.findById(request.session.user._id).orFail().exec()
         next()
     } catch (error) {
@@ -67,7 +67,7 @@ export const postAddProduct = async (
         await newProduct.save()
         response.redirect('/')
     } catch (error) {
-        next(error)
+        next(new DatabaseException('Problem while saving the newly added product.'))
     }
 }
 

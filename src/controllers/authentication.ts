@@ -10,7 +10,6 @@ import crypto from 'crypto'
 import { promisify } from 'util'
 import { PasswordResetError } from '../errors/PasswordResetError'
 import { emailClient } from '../util/emailClient'
-import { validationResult } from 'express-validator'
 
 const randomBytesAsync = promisify(crypto.randomBytes)
 const ONE_HOUR = 3600000

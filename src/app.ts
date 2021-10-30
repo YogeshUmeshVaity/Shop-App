@@ -13,7 +13,7 @@ import flash from 'connect-flash'
 import * as errorController from './controllers/error'
 import { addLocals, initializeUser } from './controllers/admin'
 import { initializeSession } from './controllers/authentication'
-import { DatabaseException } from './exceptions/DatabaseException'
+import { DatabaseException } from './exceptions/HttpExceptions/DatabaseException'
 
 const app = express()
 const csrfProtection = csrf()

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { UserModel as User } from '../models/User'
-import { DatabaseException } from '../exceptions/DatabaseException'
+import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 
 export const initializeUser = async (
     request: Request,

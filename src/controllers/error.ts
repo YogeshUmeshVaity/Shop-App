@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { DatabaseException } from '../exceptions/DatabaseException'
+import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 
 export const get404 = (request: Request, response: Response): void => {
     response.status(404).render('404', {
@@ -22,6 +22,8 @@ export const handleErrors = (
     next: NextFunction
 ): void => {
     if (error instanceof DatabaseException) {
+        // TODO: in production, don't use console.log or console.err because it is not async and is very slow. User dedicated loggers.
+        console.log(error)
         return response.status(error.status).render('500', {
             pageTitle: 'Something went wrong.',
             routePath: '/500'

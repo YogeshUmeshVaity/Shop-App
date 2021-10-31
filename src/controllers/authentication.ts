@@ -8,8 +8,9 @@ import bcrypt from 'bcryptjs'
 import { BeAnObject } from '@typegoose/typegoose/lib/types'
 import crypto from 'crypto'
 import { promisify } from 'util'
-import { PasswordResetError } from '../errors/PasswordResetError'
+import { PasswordResetException } from '../exceptions/PasswordResetError'
 import { emailClient } from '../util/emailClient'
+import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 
 const randomBytesAsync = promisify(crypto.randomBytes)
 const ONE_HOUR = 3600000
@@ -42,7 +43,7 @@ export const initializeSession = async (
         })(request, response, next)
         // Do not call next() here. It causes error.
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Unable to create the express-session.`))
     }
 }
 
@@ -61,6 +62,7 @@ export const getLogin = async (
     })
 }
 
+// TODO: Find a way to handle errors separately for findOne() and matchPassword().
 export const postLogin = async (
     request: Request,
     response: Response,
@@ -98,7 +100,11 @@ export const postLogin = async (
             })
         }
     } catch (error) {
-        next(error)
+        next(
+            new DatabaseException(
+                `Problem retrieving the user from the database or matching the passwords`
+            )
+        )
     }
 }
 
@@ -124,6 +130,8 @@ export const getSignup = async (
     })
 }
 
+// TODO: Find a way to handle errors separately for hashThe() and createNewUser(). See what expceptions
+// each of these functions throw.
 export const postSignup = async (
     request: Request,
     response: Response,
@@ -139,15 +147,11 @@ export const postSignup = async (
         await sendWelcomeEmail(email)
         response.redirect('/login')
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Problem while hashing password or saving the user to database`))
     }
 }
 
-export const getResetPassword = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-): Promise<void> => {
+export const getResetPassword = async (request: Request, response: Response): Promise<void> => {
     const errorMessage = extractErrorMessage(request)
     response.render('authentication/reset-password', {
         pageTitle: 'Reset Password',
@@ -161,6 +165,9 @@ export const getResetPassword = async (
  * sent by us. This is like the csrf protection. We also save the expiry time in the database for
  * this token. Expiry time ensures that this token is only valid in a certain time frame better for
  * security.
+ *
+ * // TODO: Find a way to handle errors separately for findOne() and saveTokenToDb() and
+ * // sendPasswordResetEmail(). See what exceptions each of these functions throw.
  */
 export const postResetPassword = async (
     request: Request,
@@ -178,13 +185,13 @@ export const postResetPassword = async (
         }
 
         await saveTokenToDb(user, token)
-        sendPasswordResetEmail(user.email, token)
+        await sendPasswordResetEmail(user.email, token)
         response.redirect('/')
     } catch (error) {
-        if (error instanceof PasswordResetError) {
+        if (error instanceof PasswordResetException) {
             return response.redirect('/reset-password')
         } else {
-            next(error)
+            next(new DatabaseException(`Something went wrong while resetting the password.`))
         }
     }
 }
@@ -211,10 +218,13 @@ export const getNewPassword = async (
             resetPasswordToken: resetPasswordToken
         })
     } catch (error) {
-        next(error)
+        next(
+            new DatabaseException(`Unable to verify the authenticity of the password reset token.`)
+        )
     }
 }
 
+// TODO: Handle error for hashThe() function separately.
 export const postNewPassword = async (
     request: Request,
     response: Response,
@@ -227,7 +237,9 @@ export const postNewPassword = async (
         await savePasswordAndDeleteToken(user, hashedPassword)
         response.redirect('/login')
     } catch (error) {
-        next(error)
+        next(
+            new DatabaseException(`Unable to verify the authenticity of the password reset token.`)
+        )
     }
 }
 
@@ -284,7 +296,7 @@ async function createResetToken(): Promise<string> {
     } catch (error) {
         console.log(error)
         // TODO: Not sure if it's a good idea not passing the original error object.
-        throw new PasswordResetError('Error creating the password reset token.')
+        throw new PasswordResetException('Error creating the password reset token.')
     }
     return buffer.toString('hex')
 }

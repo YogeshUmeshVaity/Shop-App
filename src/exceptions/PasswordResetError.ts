@@ -1,4 +1,4 @@
-export class PasswordResetError extends Error {
+export class PasswordResetException extends Error {
     constructor(message: string) {
         super(message)
     }

@@ -24,11 +24,15 @@ export const handleErrors = (
     if (error instanceof DatabaseException) {
         // TODO: in production, don't use console.log or console.err because it is not async and is very slow. User dedicated loggers.
         console.log(error)
+        // TODO: Error message could be passed here.
         return response.status(error.status).render('500', {
             pageTitle: 'Something went wrong.',
             routePath: '/500'
         })
     }
-    // TODO: This case is not yet handled. Deal with the error of type 'unknown'.
-    next(error)
+    console.log(error)
+    return response.render('500', {
+        pageTitle: 'Something went wrong.',
+        routePath: '/500'
+    })
 }

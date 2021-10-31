@@ -8,19 +8,14 @@ export const initializeUser = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const userId = request.session.user._id
     try {
         if (!request.session.user) {
             return next()
         }
-        request.user = await User.findById(userId).orFail().exec()
+        request.user = await User.findById(request.session.user._id).orFail().exec()
         next()
     } catch (error) {
-        next(
-            new DatabaseException(
-                `Error initializing the user. User with ID ${userId} cannot be found.`
-            )
-        )
+        next(new DatabaseException(`Error initializing the user.`))
     }
 }
 

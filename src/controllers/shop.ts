@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { OrderModel as Order } from '../models/Order'
-import { UserModel as User } from '../models/User'
+import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 
 export const getProducts = async (
     request: Request,
@@ -15,7 +15,7 @@ export const getProducts = async (
             routePath: '/products'
         })
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Unable to retrieve all products from the database.`))
     }
 }
 
@@ -33,7 +33,7 @@ export const getProductDetails = async (
             routePath: '/products'
         })
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Product with ID ${productId} cannot be found.`))
     }
 }
 
@@ -49,7 +49,7 @@ export const getIndex = async (
             routePath: '/'
         })
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Unable to retrieve all products from the database.`))
     }
 }
 
@@ -71,10 +71,11 @@ export const getCart = async (
             cartItems: userWithCartProducts.cart.items
         })
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Unable to populate cart items for this user.`))
     }
 }
 
+// TODO: Handle errors separately for findById() and addToCart().
 export const postCart = async (
     request: Request,
     response: Response,
@@ -87,7 +88,10 @@ export const postCart = async (
         await request.user.addToCart(product, newQuantity)
         response.redirect('/cart')
     } catch (error) {
-        next(error)
+        next(
+            new DatabaseException(`Either the product with that ID was not found or cannot add
+                                    the product to the cart.`)
+        )
     }
 }
 
@@ -102,7 +106,7 @@ export const deleteCartItem = async (
         await request.user.deleteCartItem(productId)
         response.redirect('/cart')
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Something went wrong while deleting the cart item.`))
     }
 }
 
@@ -115,7 +119,7 @@ export const postOrder = async (
         await Order.addOrder(request.user)
         response.redirect('/orders')
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Unable to add the order for this user.`))
     }
 }
 
@@ -132,7 +136,7 @@ export const getOrders = async (
             orders: orders
         })
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Cannot find the order for this user ID.`))
     }
 }
 

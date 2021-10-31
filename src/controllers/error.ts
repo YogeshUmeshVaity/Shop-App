@@ -29,6 +29,6 @@ export const handleErrors = (
             routePath: '/500'
         })
     }
-    // TODO: This case is not yet handled. Either remove this or deal with the error of type 'unknown'.
+    // TODO: This case is not yet handled. Deal with the error of type 'unknown'.
     next(error)
 }

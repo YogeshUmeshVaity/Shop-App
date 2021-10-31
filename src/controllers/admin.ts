@@ -8,29 +8,19 @@ export const initializeUser = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const userId = request.session.user._id
     try {
         if (!request.session.user) {
             return next()
         }
-        request.user = await User.findById(request.session.user._id).orFail().exec()
+        request.user = await User.findById(userId).orFail().exec()
         next()
     } catch (error) {
-        next(error)
-    }
-}
-
-export const createTestUser1 = async (): Promise<void> => {
-    const user = await User.findOne()
-    if (!user) {
-        const user = new User({
-            name: 'John',
-            email: 'john@test.com',
-            cart: {
-                items: [],
-                totalPrice: 0
-            }
-        })
-        await user.save()
+        next(
+            new DatabaseException(
+                `Error initializing the user. User with ID ${userId} cannot be found.`
+            )
+        )
     }
 }
 
@@ -67,7 +57,7 @@ export const postAddProduct = async (
         await newProduct.save()
         response.redirect('/')
     } catch (error) {
-        next(new DatabaseException('Problem while saving the newly added product.'))
+        next(new DatabaseException('Problem saving the new product to the database.'))
     }
 }
 
@@ -89,7 +79,11 @@ export const getEditProduct = async (
             validationErrors: []
         })
     } catch (error) {
-        next(error)
+        next(
+            new DatabaseException(
+                `Editing of product failed. The product with ID ${productId} cannot not be found.`
+            )
+        )
     }
 }
 
@@ -107,9 +101,11 @@ export const postEditProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const productId = request.body.productId
+    const userId = request.user._id
     try {
         await Product.findOneAndUpdate(
-            { _id: request.body.productId, createdByUserId: request.user._id },
+            { _id: productId, createdByUserId: userId },
             {
                 title: request.body.title,
                 imageUrl: request.body.imageUrl,
@@ -119,7 +115,12 @@ export const postEditProduct = async (
         )
         return response.redirect('/admin/products')
     } catch (error) {
-        next(error)
+        next(
+            new DatabaseException(
+                `Editing of product failed. The product with ID ${productId} created by 
+                 userId ${userId} cannot not be found.`
+            )
+        )
     }
 }
 
@@ -128,15 +129,16 @@ export const getProducts = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const userId = request.user._id
     try {
         response.render('admin/product-list', {
             // Shows only the products created by the currently logged in user.
-            productList: await Product.find({ createdByUserId: request.user._id }),
+            productList: await Product.find({ createdByUserId: userId }),
             pageTitle: 'Admin Products',
             routePath: '/admin/products'
         })
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Unable to retrieve the products created by user ID ${userId}`))
     }
 }
 
@@ -153,6 +155,6 @@ export const postDeleteProduct = async (
         await user.deleteCartItem(productId)
         response.redirect('/admin/products')
     } catch (error) {
-        next(error)
+        next(new DatabaseException(`Unable to the delete the product.`))
     }
 }

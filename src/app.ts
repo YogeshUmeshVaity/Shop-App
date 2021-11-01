@@ -9,12 +9,13 @@ import mongoose from 'mongoose'
 import csrf from 'csurf'
 import flash from 'connect-flash'
 import multer from 'multer'
+import { fileFilter, fileStorage } from './util/multer'
 
 // Controllers
 import * as errorController from './controllers/error'
 import { addLocals, initializeUser } from './controllers/admin'
 import { initializeSession } from './controllers/authentication'
-import { fileStorage } from './util/multer'
+
 
 const app = express()
 const csrfProtection = csrf()
@@ -33,8 +34,8 @@ app.set('views', path.join(__dirname, 'views'))
 // It tries to put all data into its body as text. Images and files are not supported.
 app.use(express.urlencoded({ extended: false }))
 
-// Look for the single uploaded file.
-app.use(multer({ storage: fileStorage }).single('image'))
+// Look for a single uploaded file.
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))
 
 // Initialize session.
 app.use(initializeSession)

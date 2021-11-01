@@ -42,7 +42,7 @@ export const postAddProduct = async (
     next: NextFunction
 ): Promise<void> => {
     const image = request.file
-    console.log(image)
+    console.log('uploaded file: ', image)
     try {
         const newProduct = new Product({
             title: request.body.title,

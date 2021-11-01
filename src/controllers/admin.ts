@@ -41,12 +41,13 @@ export const postAddProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const image = request.file
+    console.log(image)
     try {
         const newProduct = new Product({
             title: request.body.title,
             price: request.body.price,
             description: request.body.description,
-            imageUrl: request.body.imageUrl,
             createdByUserId: request.session.user._id
         })
         await newProduct.save()

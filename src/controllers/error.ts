@@ -11,7 +11,8 @@ export const get404 = (request: Request, response: Response): void => {
 export const get500 = (request: Request, response: Response): void => {
     response.status(500).render('500', {
         pageTitle: 'Something went wrong.',
-        routePath: '/500'
+        routePath: '/500',
+        isAuthenticated: request.session.isLoggedIn
     })
 }
 
@@ -22,17 +23,21 @@ export const handleErrors = (
     next: NextFunction
 ): void => {
     if (error instanceof DatabaseException) {
-        // TODO: in production, don't use console.log or console.err because it is not async and is very slow. User dedicated loggers.
+        console.log(`Inside database exception handler.`)
+        // TODO: in production, don't use console.log() or console.err() because it is not async and is very slow. Use dedicated loggers.
         console.log(error)
         // TODO: Error message could be passed here.
         return response.status(error.status).render('500', {
             pageTitle: 'Something went wrong.',
-            routePath: '/500'
+            routePath: '/500',
+            isAuthenticated: request.session.isLoggedIn
         })
     }
+    console.log(`Inside unknown error handler.`)
     console.log(error)
     return response.render('500', {
         pageTitle: 'Something went wrong.',
-        routePath: '/500'
+        routePath: '/500',
+        isAuthenticated: false // Must be false, because session is undefined for unknown errors.
     })
 }

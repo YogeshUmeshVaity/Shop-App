@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express'
+import express from 'express'
 import { adminRoutes } from './routes/admin'
 import { shopRoutes } from './routes/shop'
 import { authRoutes } from './routes/authentication'
@@ -8,12 +8,13 @@ import { connectOptions, databaseUrl } from './util/database'
 import mongoose from 'mongoose'
 import csrf from 'csurf'
 import flash from 'connect-flash'
+import multer from 'multer'
 
 // Controllers
 import * as errorController from './controllers/error'
 import { addLocals, initializeUser } from './controllers/admin'
 import { initializeSession } from './controllers/authentication'
-import { DatabaseException } from './exceptions/HttpExceptions/DatabaseException'
+import { fileStorage } from './util/multer'
 
 const app = express()
 const csrfProtection = csrf()
@@ -27,7 +28,13 @@ app.set('view engine', 'ejs')
 // Set the name of the directory where views are stored.
 app.set('views', path.join(__dirname, 'views'))
 
+// Text, number, url or plaintext
+// Content-type: application/x-www-form-urlencoded.
+// It tries to put all data into its body as text. Images and files are not supported.
 app.use(express.urlencoded({ extended: false }))
+
+// Look for the single uploaded file.
+app.use(multer({ storage: fileStorage }).single('image'))
 
 // Initialize session.
 app.use(initializeSession)

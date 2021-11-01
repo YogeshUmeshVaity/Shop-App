@@ -11,7 +11,7 @@
         <% if (errorMessage) { %>
             <div class="user-message user-message--error"><%= errorMessage %></div>
         <% } %>
-        <form class="product-form" action="<% if (isEditingMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST">
+        <form class="product-form" action="<% if (isEditingMode) { %>/admin/edit-product<% } else { %>/admin/add-product<% } %>" method="POST" enctype="multipart/form-data">
             <div class="form-control">
                 <label for="title">Title</label>
                 <input 
@@ -21,7 +21,7 @@
                     id="title" 
                     value="<% if (isEditingMode || hasError) { %><%= productToEdit.title %><% } %>">
             </div>
-            <div class="form-control">
+            <!-- <div class="form-control">
                 <label for="imageUrl">Image URL</label>
                 <input 
                     class="<%= validationErrors.find(error => error.param === 'imageUrl') ? 'invalid' : '' %>"
@@ -29,6 +29,13 @@
                     name="imageUrl" 
                     id="imageUrl" 
                     value="<% if (isEditingMode || hasError) { %><%= productToEdit.imageUrl %><% } %>">
+            </div> -->
+            <div class="form-control">
+                <label for="image">Image URL</label>
+                <input 
+                    type="file" 
+                    name="image" 
+                    id="image">
             </div>
             <div class="form-control">
                 <label for="price">Price</label>

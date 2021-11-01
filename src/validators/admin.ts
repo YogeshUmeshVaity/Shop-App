@@ -60,7 +60,6 @@ export const validatePostAddProduct = [
         .isString()
         .isLength({ min: 3 })
         .trim(),
-    body('imageUrl', 'Please enter a valid URL.').isURL(),
     body('price', 'Price needs to be a number.').isFloat(),
     body(
         'description',

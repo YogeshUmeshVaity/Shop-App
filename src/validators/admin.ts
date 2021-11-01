@@ -55,6 +55,30 @@ const handleErrorsForPostEditProduct = (
     next()
 }
 
+const validateProductImageFileForPostAddProduct = (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): void => {
+    const image = request.file
+    if (!image) {
+        return response.status(422).render('admin/edit-product', {
+            pageTitle: 'Add Product',
+            routePath: '/admin/add-product',
+            isEditingMode: false,
+            hasError: true,
+            errorMessage: 'The selected file for the product image is not an image.',
+            validationErrors: [],
+            productToEdit: {
+                title: request.body.title,
+                price: request.body.price,
+                description: request.body.description,
+            }
+        })
+    }
+    next()
+}
+
 export const validatePostAddProduct = [
     body('title', 'Title needs to be a text and minimum 3 characters long.')
         .isString()
@@ -67,6 +91,7 @@ export const validatePostAddProduct = [
     )
         .isLength({ min: MIN_CHARS, max: MAX_CHARS })
         .trim(),
+    validateProductImageFileForPostAddProduct,
     handleErrorsForPostAddProduct
 ]
 

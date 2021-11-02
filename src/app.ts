@@ -52,8 +52,12 @@ app.use(initializeUser)
 // Adds frequently required data all at once to the view for every request.
 app.use(addLocals)
 
-// Used for serving public static files.
+// Used for serving public static files. Express assumes that the files are served from the root
+// directory. That means the directory 'public' is not included in the path.
+// If you want the 'public' directory included, mention that initially like:
+// app.use('/public', express.static(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'images')))
 
 app.use('/admin', adminRoutes)
 app.use('/', shopRoutes)

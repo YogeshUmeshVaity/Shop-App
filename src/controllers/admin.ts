@@ -49,7 +49,7 @@ export const postAddProduct = async (
             title: request.body.title,
             price: request.body.price,
             description: request.body.description,
-            imageUrl: request.file.path,
+            imageUrl: request.file.filename,
             createdByUserId: request.session.user._id
         })
         await newProduct.save()
@@ -102,15 +102,16 @@ export const postEditProduct = async (
     const productId = request.body.productId
     const userId = request.user._id
     try {
-        await Product.findOneAndUpdate(
-            { _id: productId, createdByUserId: userId },
-            {
-                title: request.body.title,
-                imageUrl: request.body.imageUrl,
-                description: request.body.description,
-                price: request.body.price
-            }
-        )
+        const productToUpdate = await Product.findOne({ _id: productId, createdByUserId: userId })
+            .orFail()
+            .exec()
+        productToUpdate.title = request.body.title
+        productToUpdate.description = request.body.description
+        productToUpdate.price = request.body.price
+        if (request.file) {
+            productToUpdate.imageUrl = request.file.filename
+        }
+        await productToUpdate.save()
         return response.redirect('/admin/products')
     } catch (error) {
         next(

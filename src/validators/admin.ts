@@ -72,7 +72,31 @@ const validateProductImageFileForPostAddProduct = (
             productToEdit: {
                 title: request.body.title,
                 price: request.body.price,
-                description: request.body.description,
+                description: request.body.description
+            }
+        })
+    }
+    next()
+}
+
+const validateProductImageFileForPostEditProduct = (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): void => {
+    const image = request.file
+    if (!image) {
+        return response.status(422).render('admin/edit-product', {
+            pageTitle: 'Edit Product',
+            routePath: '/admin/add-product',
+            isEditingMode: true,
+            hasError: true,
+            errorMessage: 'The selected file for the product image is not an image.',
+            validationErrors: [],
+            productToEdit: {
+                title: request.body.title,
+                price: request.body.price,
+                description: request.body.description
             }
         })
     }
@@ -108,5 +132,6 @@ export const validatePostEditProduct = [
     )
         .isLength({ min: MIN_CHARS, max: MAX_CHARS })
         .trim(),
+    validateProductImageFileForPostEditProduct,
     handleErrorsForPostEditProduct
 ]

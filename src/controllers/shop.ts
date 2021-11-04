@@ -160,6 +160,10 @@ export const getInvoice = async (
     console.log(invoicePath)
     try {
         const invoiceData = await fs.readFile(invoicePath)
+        response.setHeader('Content-Type', 'application/pdf')
+        // This header causes the file to open inline. Use 'attachment' instead of inline,
+        // if you want the file to open as a download.
+        response.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
         response.send(invoiceData)
     } catch (error) {
         next(new Error('Error reading the invoice file.'))

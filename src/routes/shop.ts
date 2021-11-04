@@ -19,3 +19,5 @@ shopRoutes.post('/delete-cart-item', authenticate, shopController.deleteCartItem
 shopRoutes.post('/create-order', authenticate, shopController.postOrder)
 
 shopRoutes.get('/orders', authenticate, shopController.getOrders)
+
+shopRoutes.get('/orders/:orderId', authenticate, shopController.getInvoice)

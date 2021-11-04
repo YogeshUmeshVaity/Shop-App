@@ -32,6 +32,16 @@ export const handleErrors = (
             routePath: '/500',
             isAuthenticated: request.session.isLoggedIn
         })
+    } else if (error instanceof Error) {
+        console.log(`Inside database exception handler.`)
+        // TODO: in production, don't use console.log() or console.err() because it is not async and is very slow. Use dedicated loggers.
+        console.log(error)
+        // TODO: Error message could be passed here.
+        return response.status(500).render('500', {
+            pageTitle: 'Something went wrong.',
+            routePath: '/500',
+            isAuthenticated: request.session.isLoggedIn
+        })
     }
     console.log(`Inside unknown error handler.`)
     console.log(error)

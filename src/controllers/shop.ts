@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { OrderModel as Order } from '../models/Order'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
+import fs from 'fs/promises'
+import path from 'path'
 
 export const getProducts = async (
     request: Request,
@@ -145,4 +147,21 @@ export const getCheckout = (request: Request, response: Response): void => {
         pageTitle: 'Checkout',
         routePath: '/checkout'
     })
+}
+
+export const getInvoice = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    const orderId = request.params.orderId
+    const invoiceName = 'invoice-' + orderId + '.pdf'
+    const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
+    console.log(invoicePath)
+    try {
+        const invoiceData = await fs.readFile(invoicePath)
+        response.send(invoiceData)
+    } catch (error) {
+        next(new Error('Error reading the invoice file.'))
+    }
 }

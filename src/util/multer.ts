@@ -17,7 +17,7 @@ export const fileStorage = multer.diskStorage({
         callback: DestinationCallback
     ): void => {
         // Need to manually create the directory before first use.
-        // TODO: Make folder creation automatic: https://github.com/expressjs/multer/issues/556
+        // TODO: Make folder creation automatic: https://github.com/expressjs/multer/issues/556#issuecomment-663837369
         callback(null, path.join(__dirname, '../images/'))
     },
 

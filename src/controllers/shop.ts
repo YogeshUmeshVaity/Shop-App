@@ -4,6 +4,7 @@ import { OrderModel as Order } from '../models/Order'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 import fs from 'fs/promises'
 import path from 'path'
+import { ReadFileException } from '../exceptions/ReadFileException'
 
 export const getProducts = async (
     request: Request,
@@ -61,7 +62,7 @@ export const getCart = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        // TODO: App crashes after you navigate to cart when a product is deleted while it's still in the cart. 
+        // TODO: App crashes after you navigate to cart when a product is deleted while it's still in the cart.
         // TODO: So, we should delete the product from cart when the it's deleted from the products collection.
         const userWithCartProducts = await request.user
             .populate('cart.items.productId')
@@ -155,17 +156,42 @@ export const getInvoice = async (
     next: NextFunction
 ): Promise<void> => {
     const orderId = request.params.orderId
-    const invoiceName = 'invoice-' + orderId + '.pdf'
-    const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
-    console.log(invoicePath)
+    const userId = request.user._id
     try {
-        const invoiceData = await fs.readFile(invoicePath)
-        response.setHeader('Content-Type', 'application/pdf')
-        // This header causes the file to open inline. Use 'attachment' instead of inline,
-        // if you want the file to open as a download.
-        response.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
-        response.send(invoiceData)
+        await checkAuthorization(orderId, userId)
+        const invoiceName = 'invoice-' + orderId + '.pdf'
+        const invoice = await createInvoice(invoiceName)
+        sendInvoice(response, invoiceName, invoice)
     } catch (error) {
-        next(new Error('Error reading the invoice file.'))
+        next(error)
+    }
+}
+
+function sendInvoice(response: Response, invoiceName: string, invoice: Buffer) {
+    response.setHeader('Content-Type', 'application/pdf')
+    // This header causes the file to open inline. Use 'attachment' instead of inline,
+    // if you want the file to open as a download.
+    response.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
+    response.send(invoice)
+}
+
+async function checkAuthorization(orderId: string, userId: string) {
+    try {
+        // The check for 'user._id' makes sure only the authorized user has access to invoice.
+        await Order.findOne({ _id: orderId, 'user._id': userId }).orFail().exec()
+    } catch (error) {
+        throw new DatabaseException(
+            'This user is not authorized to access the invoice of this order.'
+        )
+    }
+}
+
+async function createInvoice(invoiceName: string): Promise<Buffer> {
+    const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
+    try {
+        const buffer = await fs.readFile(invoicePath)
+        return buffer
+    } catch (error) {
+        throw new ReadFileException('Error reading the invoice file.')
     }
 }

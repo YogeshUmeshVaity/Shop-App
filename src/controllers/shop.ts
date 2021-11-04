@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { OrderModel as Order } from '../models/Order'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
-import fs from 'fs/promises'
+import fs, { ReadStream } from 'fs'
 import path from 'path'
 import { ReadFileException } from '../exceptions/ReadFileException'
 
@@ -160,19 +160,19 @@ export const getInvoice = async (
     try {
         await checkAuthorization(orderId, userId)
         const invoiceName = 'invoice-' + orderId + '.pdf'
-        const invoice = await createInvoice(invoiceName)
-        sendInvoice(response, invoiceName, invoice)
+        const invoiceFile = await createInvoiceFile(invoiceName)
+        sendInvoiceFile(response, invoiceName, invoiceFile)
     } catch (error) {
         next(error)
     }
 }
 
-function sendInvoice(response: Response, invoiceName: string, invoice: Buffer) {
+function sendInvoiceFile(response: Response, invoiceName: string, invoice: ReadStream) {
     response.setHeader('Content-Type', 'application/pdf')
     // This header causes the file to open inline. Use 'attachment' instead of inline,
     // if you want the file to open as a download.
     response.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
-    response.send(invoice)
+    invoice.pipe(response)
 }
 
 async function checkAuthorization(orderId: string, userId: string) {
@@ -186,12 +186,31 @@ async function checkAuthorization(orderId: string, userId: string) {
     }
 }
 
-async function createInvoice(invoiceName: string): Promise<Buffer> {
+/**
+ * If you read a file like this, node will first of all access that file, read the entire content
+ * into the memory and then return it with the response. This means that for bigger files, this will
+ * take very long before a response is sent and your memory on the server might actually overflow
+ * at some point for many incoming requests because it has to read all the data into memory which
+ * of course is limited. So reading file data into memory to serve it as a response is not really
+ * a good practice, especially for big files. Use streams as explained in the function after this.
+ */
+// async function createInvoice(invoiceName: string): Promise<Buffer> {
+//     const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
+//     try {
+//         const buffer = await fs.readFile(invoicePath)
+//         return buffer
+//     } catch (error) {
+//         throw new ReadFileException('Error reading the invoice file.')
+//     }
+// }
+
+function createInvoiceFile(invoiceName: string): ReadStream {
     const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
-    try {
-        const buffer = await fs.readFile(invoicePath)
-        return buffer
-    } catch (error) {
+    const invoiceFile = fs.createReadStream(invoicePath)
+    // Streams can emit an error event. You can listen for this event to prevent the default
+    // behavior of throwing the error.
+    invoiceFile.on('error', function () {
         throw new ReadFileException('Error reading the invoice file.')
-    }
+    })
+    return invoiceFile
 }

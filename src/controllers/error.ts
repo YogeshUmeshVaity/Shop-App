@@ -17,6 +17,17 @@ export const get500 = (request: Request, response: Response): void => {
     })
 }
 
+export const logErrors = (
+    error: unknown,
+    request: Request,
+    response: Response,
+    next: NextFunction
+): void => {
+    // TODO: in production, don't use console.log() or console.err() because it is not async and is very slow. Use dedicated loggers.
+    console.log(error)
+    next(error)
+}
+
 export const handleErrors = (
     error: unknown,
     request: Request,
@@ -24,8 +35,6 @@ export const handleErrors = (
     next: NextFunction
 ): void => {
     if (error instanceof DatabaseException) {
-        // TODO: in production, don't use console.log() or console.err() because it is not async and is very slow. Use dedicated loggers.
-        console.log(error)
         // TODO: Error message could be passed here.
         return response.status(error.status).render('500', {
             pageTitle: 'Something went wrong.',
@@ -33,8 +42,6 @@ export const handleErrors = (
             isAuthenticated: request.session.isLoggedIn
         })
     } else if (error instanceof ReadFileException) {
-        // TODO: in production, don't use console.log() or console.err() because it is not async and is very slow. Use dedicated loggers.
-        console.log(error)
         // TODO: Error message could be passed here.
         return response.status(500).render('500', {
             pageTitle: 'Something went wrong.',
@@ -42,8 +49,6 @@ export const handleErrors = (
             isAuthenticated: request.session.isLoggedIn
         })
     } else if (error instanceof Error) {
-        // TODO: in production, don't use console.log() or console.err() because it is not async and is very slow. Use dedicated loggers.
-        console.log(error)
         // TODO: Error message could be passed here.
         return response.status(500).render('500', {
             pageTitle: 'Something went wrong.',
@@ -51,8 +56,6 @@ export const handleErrors = (
             isAuthenticated: request.session.isLoggedIn
         })
     }
-    console.log(`Inside unknown error handler.`)
-    console.log(error)
     return response.render('500', {
         pageTitle: 'Something went wrong.',
         routePath: '/500',

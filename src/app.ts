@@ -73,6 +73,7 @@ app.use(errorController.get404)
  * omits all the other middleware in the chain and skips straight to the error handling middleware
  * which is recognized by the fact that it has four arguments.
  */
+app.use(errorController.logErrors)
 app.use(errorController.handleErrors)
 
 mongoose

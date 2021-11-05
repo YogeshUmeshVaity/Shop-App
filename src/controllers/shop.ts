@@ -1,10 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, response, Response } from 'express'
 import { ProductModel as Product } from '../models/Product'
 import { OrderModel as Order } from '../models/Order'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 import fs, { ReadStream } from 'fs'
 import path from 'path'
 import { ReadFileException } from '../exceptions/ReadFileException'
+import PDFDocument from 'pdfkit'
 
 export const getProducts = async (
     request: Request,
@@ -160,19 +161,11 @@ export const getInvoice = async (
     try {
         await checkAuthorization(orderId, userId)
         const invoiceName = 'invoice-' + orderId + '.pdf'
-        const invoiceFile = await createInvoiceFile(invoiceName)
-        sendInvoiceFile(response, invoiceName, invoiceFile)
+        const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
+        createInvoicePDFAndSend(invoicePath, invoiceName, response)
     } catch (error) {
         next(error)
     }
-}
-
-function sendInvoiceFile(response: Response, invoiceName: string, invoice: ReadStream) {
-    response.setHeader('Content-Type', 'application/pdf')
-    // This header causes the file to open inline. Use 'attachment' instead of inline,
-    // if you want the file to open as a download.
-    response.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
-    invoice.pipe(response)
 }
 
 async function checkAuthorization(orderId: string, userId: string) {
@@ -204,8 +197,7 @@ async function checkAuthorization(orderId: string, userId: string) {
 //     }
 // }
 
-function createInvoiceFile(invoiceName: string): ReadStream {
-    const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
+function createInvoiceFile(invoiceName: string, invoicePath: string): ReadStream {
     const invoiceFile = fs.createReadStream(invoicePath)
     // Streams can emit an error event. You can listen for this event to prevent the default
     // behavior of throwing the error.
@@ -213,4 +205,23 @@ function createInvoiceFile(invoiceName: string): ReadStream {
         throw new ReadFileException('Error reading the invoice file.')
     })
     return invoiceFile
+}
+
+function createInvoicePDFAndSend(invoicePath: string, invoiceName: string, response: Response) {
+    response.setHeader('Content-Type', 'application/pdf')
+    // This header causes the file to open inline. Use 'attachment' instead of inline,
+    // if you want the file to open as a download.
+    response.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
+
+    // This is a ReadableStream, so we can read from it and write to a WriteStream.
+    const invoicePDF = new PDFDocument()
+    invoicePDF.pipe(fs.createWriteStream(invoicePath)) // Write to the file at invoicePath
+    invoicePDF.pipe(response) // Write to the response.
+
+    // Now whatever we add on the fly to the invoicePDF will be forwarded into the file at
+    // invoicePath and also into the response.
+    invoicePDF.text('Hello this is your order.')
+
+    // Once you are finished writing text call end() to indicate the end of stream.
+    invoicePDF.end()
 }

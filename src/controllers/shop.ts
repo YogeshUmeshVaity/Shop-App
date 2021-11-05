@@ -1,11 +1,12 @@
 import { NextFunction, Request, response, Response } from 'express'
-import { ProductModel as Product } from '../models/Product'
-import { OrderModel as Order } from '../models/Order'
+import { ProductModel } from '../models/Product'
+import { Order, OrderItem, OrderModel } from '../models/Order'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 import fs, { ReadStream } from 'fs'
 import path from 'path'
 import { ReadFileException } from '../exceptions/ReadFileException'
 import PDFDocument from 'pdfkit'
+import { DocumentType } from '@typegoose/typegoose'
 
 export const getProducts = async (
     request: Request,
@@ -14,7 +15,7 @@ export const getProducts = async (
 ): Promise<void> => {
     try {
         response.render('shop/product-list', {
-            productList: await Product.find(),
+            productList: await ProductModel.find(),
             pageTitle: 'All Products',
             routePath: '/products'
         })
@@ -30,7 +31,7 @@ export const getProductDetails = async (
 ): Promise<void> => {
     const productId = request.params.productId
     try {
-        const requestedProduct = await Product.findById(productId).orFail()
+        const requestedProduct = await ProductModel.findById(productId).orFail()
         response.render('shop/product-details', {
             product: requestedProduct,
             pageTitle: requestedProduct.title,
@@ -48,7 +49,7 @@ export const getIndex = async (
 ): Promise<void> => {
     try {
         response.render('shop/index', {
-            productList: await Product.find(),
+            productList: await ProductModel.find(),
             pageTitle: 'Shop',
             routePath: '/'
         })
@@ -88,7 +89,7 @@ export const postCart = async (
     const newQuantity = 1
     const productId = request.body.productId
     try {
-        const product = await Product.findById(productId).orFail().exec()
+        const product = await ProductModel.findById(productId).orFail().exec()
         await request.user.addToCart(product, newQuantity)
         response.redirect('/cart')
     } catch (error) {
@@ -120,7 +121,7 @@ export const postOrder = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        await Order.addOrder(request.user)
+        await OrderModel.addOrder(request.user)
         response.redirect('/orders')
     } catch (error) {
         next(new DatabaseException(`Unable to add the order for this user.`))
@@ -133,7 +134,7 @@ export const getOrders = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const orders = await Order.find({ 'user._id': request.user._id })
+        const orders = await OrderModel.find({ 'user._id': request.user._id })
         response.render('shop/orders', {
             pageTitle: 'Your Orders',
             routePath: '/orders',
@@ -159,19 +160,22 @@ export const getInvoice = async (
     const orderId = request.params.orderId
     const userId = request.user._id
     try {
-        await checkAuthorization(orderId, userId)
+        const order = await findOrderToCheckAuthorization(orderId, userId)
         const invoiceName = 'invoice-' + orderId + '.pdf'
         const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
-        createInvoicePDFAndSend(invoicePath, invoiceName, response)
+        createInvoicePDFAndSend(invoicePath, invoiceName, response, order)
     } catch (error) {
         next(error)
     }
 }
 
-async function checkAuthorization(orderId: string, userId: string) {
+async function findOrderToCheckAuthorization(
+    orderId: string,
+    userId: string
+): Promise<DocumentType<Order>> {
     try {
         // The check for 'user._id' makes sure only the authorized user has access to invoice.
-        await Order.findOne({ _id: orderId, 'user._id': userId }).orFail().exec()
+        return await OrderModel.findOne({ _id: orderId, 'user._id': userId }).orFail().exec()
     } catch (error) {
         throw new DatabaseException(
             'This user is not authorized to access the invoice of this order.'
@@ -179,13 +183,67 @@ async function checkAuthorization(orderId: string, userId: string) {
     }
 }
 
+function createInvoicePDFAndSend(
+    invoicePath: string,
+    invoiceName: string,
+    response: Response,
+    order: DocumentType<Order>
+) {
+    response.setHeader('Content-Type', 'application/pdf')
+    // This header causes the file to open inline. Use 'attachment' instead of inline,
+    // if you want the file to open as a download.
+    response.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
+
+    // This is a ReadableStream, so we can read from it and write to a WriteStream.
+    const invoicePDF = new PDFDocument()
+
+    setErrorHandlerFor(invoicePDF)
+
+    invoicePDF.pipe(fs.createWriteStream(invoicePath)) // Write to the file at invoicePath
+    invoicePDF.pipe(response) // Write to the response.
+
+    writeOrderInfoToPDF(invoicePDF, order)
+}
+
+// Streams can emit an error event. You can listen for this event to prevent the default
+// behavior of throwing the error.
+function setErrorHandlerFor(invoicePDF: PDFKit.PDFDocument) {
+    invoicePDF.on('error', function () {
+        throw new ReadFileException('Error reading the invoice file.')
+    })
+}
+
+function writeOrderInfoToPDF(invoicePDF: PDFKit.PDFDocument, order: DocumentType<Order>) {
+    // Now whatever we add on the fly to the invoicePDF will be forwarded into the file at
+    // invoicePath and also into the response.
+
+    invoicePDF.fontSize(26).text('Invoice', { underline: true, align: 'center' })
+    invoicePDF.moveDown()
+
+    let totalPrice = 0
+    order.items.forEach((item: OrderItem) => {
+        const title = item.product.title
+        const quantity = item.quantity
+        const price = item.product.price
+
+        totalPrice += quantity * price
+
+        invoicePDF.fontSize(14).text(`${title} - ${quantity} x $${price}`)
+    })
+    invoicePDF.moveDown()
+
+    invoicePDF.fontSize(20).text(`Total: $${totalPrice}`)
+
+    // Once you are finished writing text call end() to indicate the end of stream.
+    invoicePDF.end()
+}
 /**
  * If you read a file like this, node will first of all access that file, read the entire content
  * into the memory and then return it with the response. This means that for bigger files, this will
  * take very long before a response is sent and your memory on the server might actually overflow
  * at some point for many incoming requests because it has to read all the data into memory which
  * of course is limited. So reading file data into memory to serve it as a response is not really
- * a good practice, especially for big files. Use streams as explained in the function after this.
+ * a good practice, especially for big files. Use streams as explained in the function above this.
  */
 // async function createInvoice(invoiceName: string): Promise<Buffer> {
 //     const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
@@ -196,32 +254,3 @@ async function checkAuthorization(orderId: string, userId: string) {
 //         throw new ReadFileException('Error reading the invoice file.')
 //     }
 // }
-
-function createInvoiceFile(invoiceName: string, invoicePath: string): ReadStream {
-    const invoiceFile = fs.createReadStream(invoicePath)
-    // Streams can emit an error event. You can listen for this event to prevent the default
-    // behavior of throwing the error.
-    invoiceFile.on('error', function () {
-        throw new ReadFileException('Error reading the invoice file.')
-    })
-    return invoiceFile
-}
-
-function createInvoicePDFAndSend(invoicePath: string, invoiceName: string, response: Response) {
-    response.setHeader('Content-Type', 'application/pdf')
-    // This header causes the file to open inline. Use 'attachment' instead of inline,
-    // if you want the file to open as a download.
-    response.setHeader('Content-Disposition', 'inline; filename="' + invoiceName + '"')
-
-    // This is a ReadableStream, so we can read from it and write to a WriteStream.
-    const invoicePDF = new PDFDocument()
-    invoicePDF.pipe(fs.createWriteStream(invoicePath)) // Write to the file at invoicePath
-    invoicePDF.pipe(response) // Write to the response.
-
-    // Now whatever we add on the fly to the invoicePDF will be forwarded into the file at
-    // invoicePath and also into the response.
-    invoicePDF.text('Hello this is your order.')
-
-    // Once you are finished writing text call end() to indicate the end of stream.
-    invoicePDF.end()
-}

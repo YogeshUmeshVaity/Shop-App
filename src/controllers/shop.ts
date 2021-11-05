@@ -237,6 +237,7 @@ function writeOrderInfoToPDF(invoicePDF: PDFKit.PDFDocument, order: DocumentType
     // Once you are finished writing text call end() to indicate the end of stream.
     invoicePDF.end()
 }
+
 /**
  * If you read a file like this, node will first of all access that file, read the entire content
  * into the memory and then return it with the response. This means that for bigger files, this will

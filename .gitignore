@@ -295,7 +295,11 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+### App specific data ###
 # Uploaded images while testing.
 src/images
+
+# PDF invoices for order created
+src/data/invoices
 
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,windows,linux,webstorm,visualstudiocode

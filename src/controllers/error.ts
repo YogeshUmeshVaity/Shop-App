@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
+import { FileDeleteException } from '../exceptions/FileExceptions/FileDeleteException'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
-import { ReadFileException } from '../exceptions/ReadFileException'
+import { FileReadException } from '../exceptions/ReadFileException'
 
 export const get404 = (request: Request, response: Response): void => {
     response.status(404).render('404', {
@@ -41,7 +42,14 @@ export const handleErrors = (
             routePath: '/500',
             isAuthenticated: request.session.isLoggedIn
         })
-    } else if (error instanceof ReadFileException) {
+    } else if (error instanceof FileReadException) {
+        // TODO: Error message could be passed here.
+        return response.status(500).render('500', {
+            pageTitle: 'Something went wrong.',
+            routePath: '/500',
+            isAuthenticated: request.session.isLoggedIn
+        })
+    } else if (error instanceof FileDeleteException) {
         // TODO: Error message could be passed here.
         return response.status(500).render('500', {
             pageTitle: 'Something went wrong.',

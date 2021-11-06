@@ -4,7 +4,7 @@ import { Order, OrderItem, OrderModel } from '../models/Order'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 import fs, { ReadStream } from 'fs'
 import path from 'path'
-import { ReadFileException } from '../exceptions/ReadFileException'
+import { FileReadException } from '../exceptions/ReadFileException'
 import PDFDocument from 'pdfkit'
 import { DocumentType } from '@typegoose/typegoose'
 
@@ -209,7 +209,7 @@ function createInvoicePDFAndSend(
 // behavior of throwing the error.
 function setErrorHandlerFor(invoicePDF: PDFKit.PDFDocument) {
     invoicePDF.on('error', function () {
-        throw new ReadFileException('Error reading the invoice file.')
+        throw new FileReadException('Error reading the invoice file.')
     })
 }
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { Product, ProductModel } from '../models/Product'
-import { UserModel } from '../models/User'
+import { User, UserModel } from '../models/User'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 import { DocumentType } from '@typegoose/typegoose'
 import { deleteFile } from '../util/fileSystem'
@@ -131,13 +131,33 @@ export const postDeleteProduct = async (
 ): Promise<void> => {
     try {
         const productId = request.params.productId
-        await ProductModel.deleteOne({ _id: productId, createdByUserId: request.user._id })
-        const user = await UserModel.findById(request.session.user._id).orFail().exec()
+        await deleteProductImage(request)
+        await deleteProduct(request)
+        const user = await findUser(request)
         //TODO: When a product is deleted, it needs to be deleted from the carts of all users, not just this user.
         await user.deleteCartItem(productId)
         response.redirect('/admin/products')
     } catch (error) {
-        next(new DatabaseException(`Unable to the delete the product.`))
+        next(error)
+    }
+}
+
+async function findUser(request: Request): Promise<DocumentType<User>> {
+    try {
+        return await UserModel.findById(request.session.user._id).orFail().exec()
+    } catch (err) {
+        throw new DatabaseException('Unable to the find the user.')
+    }
+}
+
+async function deleteProduct(request: Request) {
+    try {
+        await ProductModel.deleteOne({
+            _id: request.params.productId,
+            createdByUserId: request.user._id
+        })
+    } catch (err) {
+        throw new DatabaseException(`Unable to the delete the product.`)
     }
 }
 
@@ -193,4 +213,16 @@ async function findProductToUpdate(productId: string, userId: string) {
 
 function updateNewUrl(productToUpdate: DocumentType<Product>, newUrl: string) {
     productToUpdate.imageUrl = newUrl
+}
+
+async function deleteProductImage(request: Request) {
+    let productToDelete
+    try {
+        productToDelete = await ProductModel.findById(request.params.productId).orFail().exec()
+    } catch (error) {
+        throw new DatabaseException(
+            `Couldn't delete the product image because the product was not found.`
+        )
+    }
+    deleteOldImage(productToDelete)
 }

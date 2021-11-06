@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import { FileDeleteException } from '../exceptions/FileExceptions/FileDeleteException'
 
+// TODO: Should handle case, if the find doesn't exist already.
 export const deleteFile = async (filePath: string): Promise<void> => {
     try {
         await fs.unlink(filePath)

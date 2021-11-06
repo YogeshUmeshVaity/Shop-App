@@ -8,6 +8,8 @@ import { FileReadException } from '../exceptions/ReadFileException'
 import PDFDocument from 'pdfkit'
 import { DocumentType } from '@typegoose/typegoose'
 
+const ITEMS_PER_PAGE = 2
+
 export const getProducts = async (
     request: Request,
     response: Response,
@@ -47,9 +49,14 @@ export const getIndex = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const page = Number(request.query.page) // Cast it to a Number for calculation purpose.
     try {
+        const productsToDisplay = await ProductModel.find()
+            .skip((page - 1) * ITEMS_PER_PAGE)
+            .limit(ITEMS_PER_PAGE)
+            .exec()
         response.render('shop/index', {
-            productList: await ProductModel.find(),
+            productList: productsToDisplay,
             pageTitle: 'Shop',
             routePath: '/'
         })

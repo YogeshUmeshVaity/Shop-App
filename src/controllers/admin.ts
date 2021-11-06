@@ -45,15 +45,15 @@ export const postAddProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const productImage = request.file
     // Won't be thrown, taken care in validation already. This is just for non-null assertion.
-    if (!request.file) throw Error('The product file is undefined.')
-    console.log('File name: ', request.file.filename)
+    if (!productImage) throw Error('The product image file is undefined.')
     try {
         const newProduct = new ProductModel({
             title: request.body.title,
             price: request.body.price,
             description: request.body.description,
-            imageUrl: request.file.filename,
+            imageUrl: productImage.filename,
             createdByUserId: request.session.user._id
         })
         await newProduct.save()

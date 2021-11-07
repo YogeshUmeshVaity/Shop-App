@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { ProductModel } from '../models/Product'
+import { Product, ProductModel } from '../models/Product'
 import { Order, OrderItem, OrderModel } from '../models/Order'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 import fs from 'fs'
@@ -10,19 +10,41 @@ import { DocumentType } from '@typegoose/typegoose'
 
 const ITEMS_PER_PAGE = 2
 
+/**
+ * Represents pagination data to be sent to the views for the product list.
+ */
+interface Pagination {
+    currentPage: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+    nextPage: number
+    previousPage: number
+    lastPage: number
+}
+
 export const getProducts = async (
     request: Request,
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    const currentPage = getPageNumber(request)
     try {
+        const productCount = await getProductCount()
+        const productsToDisplay = await getProductsToDisplay(currentPage)
+        const pagination = preparePaginationData(currentPage, productCount)
         response.render('shop/product-list', {
-            productList: await ProductModel.find(),
+            productList: productsToDisplay,
             pageTitle: 'All Products',
-            routePath: '/products'
+            routePath: '/products',
+            currentPage: pagination.currentPage,
+            hasNextPage: pagination.hasNextPage,
+            hasPreviousPage: pagination.hasPreviousPage,
+            nextPage: pagination.nextPage,
+            previousPage: pagination.previousPage,
+            lastPage: pagination.lastPage
         })
     } catch (error) {
-        next(new DatabaseException(`Unable to retrieve all products from the database.`))
+        next(error)
     }
 }
 
@@ -49,28 +71,24 @@ export const getIndex = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    // Cast it to a Number for calculation purpose.
-    // If there is no page number in the route, then the default is 1.
-    const page = Number(request.query.page) || 1
+    const currentPage = getPageNumber(request)
     try {
-        const productCount = await ProductModel.find().countDocuments().exec()
-        const productsToDisplay = await ProductModel.find()
-            .skip((page - 1) * ITEMS_PER_PAGE)
-            .limit(ITEMS_PER_PAGE)
-            .exec()
+        const productCount = await getProductCount()
+        const productsToDisplay = await getProductsToDisplay(currentPage)
+        const pagination = preparePaginationData(currentPage, productCount)
         response.render('shop/index', {
             productList: productsToDisplay,
             pageTitle: 'Shop',
             routePath: '/',
-            currentPage: page,
-            hasNextPage: ITEMS_PER_PAGE * page < productCount,
-            hasPreviousPage: page > 1,
-            nextPage: page + 1,
-            previousPage: page - 1,
-            lastPage: Math.ceil(productCount / ITEMS_PER_PAGE)
+            currentPage: pagination.currentPage,
+            hasNextPage: pagination.hasNextPage,
+            hasPreviousPage: pagination.hasPreviousPage,
+            nextPage: pagination.nextPage,
+            previousPage: pagination.previousPage,
+            lastPage: pagination.lastPage
         })
     } catch (error) {
-        next(new DatabaseException(`Unable to retrieve all products from the database.`))
+        next(error)
     }
 }
 
@@ -185,6 +203,31 @@ export const getInvoice = async (
     }
 }
 
+function getPageNumber(request: Request): number {
+    // Cast it to a Number for calculation purpose.
+    // If there is no page number in the route, then the default is 1.
+    return Number(request.query.page) || 1
+}
+
+async function getProductsToDisplay(page: number): Promise<DocumentType<Product>[]> {
+    try {
+        return await ProductModel.find()
+            .skip((page - 1) * ITEMS_PER_PAGE)
+            .limit(ITEMS_PER_PAGE)
+            .exec()
+    } catch (err) {
+        throw new DatabaseException('Unable to fetch the product list.')
+    }
+}
+
+async function getProductCount(): Promise<number> {
+    try {
+        return await ProductModel.find().countDocuments().exec()
+    } catch (err) {
+        throw new DatabaseException('Unable to get the product count.')
+    }
+}
+
 async function findOrderToCheckAuthorization(
     orderId: string,
     userId: string
@@ -252,6 +295,17 @@ function writeOrderInfoToPDF(invoicePDF: PDFKit.PDFDocument, order: DocumentType
 
     // Once you are finished writing text call end() to indicate the end of stream.
     invoicePDF.end()
+}
+
+function preparePaginationData(currentPage: number, productCount: number): Pagination {
+    return {
+        currentPage: currentPage,
+        hasNextPage: ITEMS_PER_PAGE * currentPage < productCount,
+        hasPreviousPage: currentPage > 1,
+        nextPage: currentPage + 1,
+        previousPage: currentPage - 1,
+        lastPage: Math.ceil(productCount / ITEMS_PER_PAGE)
+    }
 }
 
 /**

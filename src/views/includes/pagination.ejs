@@ -1,4 +1,10 @@
 <!-- Page numbers -->
+<% const currentPage = paginationData.currentPage %>
+<% const previousPage = paginationData.previousPage %>
+<% const nextPage = paginationData.nextPage %>
+<% const lastPage = paginationData.lastPage %>
+<% const hasPreviousPage = paginationData.hasPreviousPage %>
+<% const hasNextPage = paginationData.hasNextPage %>
 <section class="pagination">
     <% if (currentPage !== 1 && previousPage !== 1) { %>
         <a href="?page=1">1</a>

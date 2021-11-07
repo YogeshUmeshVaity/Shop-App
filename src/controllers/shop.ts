@@ -31,17 +31,12 @@ export const getProducts = async (
     try {
         const productCount = await getProductCount()
         const productsToDisplay = await getProductsToDisplay(currentPage)
-        const pagination = preparePaginationData(currentPage, productCount)
+        const paginationData = preparePaginationData(currentPage, productCount)
         response.render('shop/product-list', {
             productList: productsToDisplay,
             pageTitle: 'All Products',
             routePath: '/products',
-            currentPage: pagination.currentPage,
-            hasNextPage: pagination.hasNextPage,
-            hasPreviousPage: pagination.hasPreviousPage,
-            nextPage: pagination.nextPage,
-            previousPage: pagination.previousPage,
-            lastPage: pagination.lastPage
+            paginationData: paginationData
         })
     } catch (error) {
         next(error)
@@ -75,17 +70,12 @@ export const getIndex = async (
     try {
         const productCount = await getProductCount()
         const productsToDisplay = await getProductsToDisplay(currentPage)
-        const pagination = preparePaginationData(currentPage, productCount)
+        const paginationData = preparePaginationData(currentPage, productCount)
         response.render('shop/index', {
             productList: productsToDisplay,
             pageTitle: 'Shop',
             routePath: '/',
-            currentPage: pagination.currentPage,
-            hasNextPage: pagination.hasNextPage,
-            hasPreviousPage: pagination.hasPreviousPage,
-            nextPage: pagination.nextPage,
-            previousPage: pagination.previousPage,
-            lastPage: pagination.lastPage
+            paginationData: paginationData
         })
     } catch (error) {
         next(error)

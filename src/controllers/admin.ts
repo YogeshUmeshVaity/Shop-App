@@ -6,6 +6,7 @@ import { DocumentType } from '@typegoose/typegoose'
 import { deleteFile } from '../util/fileSystem'
 import { FileDeleteException } from '../exceptions/FileExceptions/FileDeleteException'
 import path from 'path'
+import { ITEMS_PER_PAGE, preparePaginationData } from './shop'
 
 export const initializeUser = async (
     request: Request,
@@ -112,15 +113,20 @@ export const getProducts = async (
     next: NextFunction
 ): Promise<void> => {
     const userId = request.user._id
+    const currentPage = getPageNumber(request)
     try {
+        const productCount = await getProductCount(userId)
+        const productsToDisplay = await getProductsToDisplay(currentPage, userId)
+        const paginationData = preparePaginationData(currentPage, productCount)
         response.render('admin/product-list', {
             // Shows only the products created by the currently logged in user.
-            productList: await ProductModel.find({ createdByUserId: userId }),
+            productList: productsToDisplay,
             pageTitle: 'Admin Products',
-            routePath: '/admin/products'
+            routePath: '/admin/products',
+            paginationData: paginationData
         })
     } catch (error) {
-        next(new DatabaseException(`Unable to retrieve the products created by user ID ${userId}`))
+        next(error)
     }
 }
 
@@ -225,4 +231,32 @@ async function deleteProductImage(request: Request) {
         )
     }
     deleteOldImage(productToDelete)
+}
+
+function getPageNumber(request: Request): number {
+    // Cast it to a Number for calculation purpose.
+    // If there is no page number in the route, then the default is 1.
+    return Number(request.query.page) || 1
+}
+
+async function getProductCount(userId: string): Promise<number> {
+    try {
+        return await ProductModel.find({ createdByUserId: userId }).countDocuments().exec()
+    } catch (err) {
+        throw new DatabaseException(`Unable to retrieve the product count for user ID ${userId}`)
+    }
+}
+
+async function getProductsToDisplay(
+    page: number,
+    userId: string
+): Promise<DocumentType<Product>[]> {
+    try {
+        return await ProductModel.find({ createdByUserId: userId })
+            .skip((page - 1) * ITEMS_PER_PAGE)
+            .limit(ITEMS_PER_PAGE)
+            .exec()
+    } catch (err) {
+        throw new DatabaseException(`Unable to retrieve the products created by user ID ${userId}`)
+    }
 }

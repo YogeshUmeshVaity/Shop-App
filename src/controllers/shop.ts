@@ -8,12 +8,15 @@ import { FileReadException } from '../exceptions/ReadFileException'
 import PDFDocument from 'pdfkit'
 import { DocumentType } from '@typegoose/typegoose'
 
-const ITEMS_PER_PAGE = 12
+/**
+ * Number of products to be displayed per page on home page, products page and admin products page.
+ */
+export const ITEMS_PER_PAGE = 2
 
 /**
  * Represents pagination data to be sent to the views for the product list.
  */
-interface Pagination {
+interface PaginationData {
     currentPage: number
     hasNextPage: boolean
     hasPreviousPage: boolean
@@ -287,7 +290,7 @@ function writeOrderInfoToPDF(invoicePDF: PDFKit.PDFDocument, order: DocumentType
     invoicePDF.end()
 }
 
-function preparePaginationData(currentPage: number, productCount: number): Pagination {
+export function preparePaginationData(currentPage: number, productCount: number): PaginationData {
     return {
         currentPage: currentPage,
         hasNextPage: ITEMS_PER_PAGE * currentPage < productCount,

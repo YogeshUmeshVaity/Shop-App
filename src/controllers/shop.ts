@@ -8,7 +8,7 @@ import { FileReadException } from '../exceptions/ReadFileException'
 import PDFDocument from 'pdfkit'
 import { DocumentType } from '@typegoose/typegoose'
 
-const ITEMS_PER_PAGE = 2
+const ITEMS_PER_PAGE = 12
 
 /**
  * Represents pagination data to be sent to the views for the product list.

@@ -49,8 +49,11 @@ export const getIndex = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
-    const page = Number(request.query.page) // Cast it to a Number for calculation purpose.
+    // Cast it to a Number for calculation purpose.
+    // If there is no page number in the route, then the default is 1.
+    const page = Number(request.query.page) || 1
     try {
+        const productCount = await ProductModel.find().countDocuments().exec()
         const productsToDisplay = await ProductModel.find()
             .skip((page - 1) * ITEMS_PER_PAGE)
             .limit(ITEMS_PER_PAGE)
@@ -58,7 +61,13 @@ export const getIndex = async (
         response.render('shop/index', {
             productList: productsToDisplay,
             pageTitle: 'Shop',
-            routePath: '/'
+            routePath: '/',
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < productCount,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(productCount / ITEMS_PER_PAGE)
         })
     } catch (error) {
         next(new DatabaseException(`Unable to retrieve all products from the database.`))

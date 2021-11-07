@@ -236,8 +236,15 @@ form {
   margin: 0 1rem;
 }
 
+/* The inclusion of the 'a' means that the .active class will only apply to <a> tags. Leaving it off
+ means you can apply it to any element. The .pagination before that means, the a.active will only
+apply to the child elements of the element that has pagination as a class.
+
+The a:hover is a state selector and a.active is any normal class. This means the specified properties
+will apply to both the state selector and the class. */
 .pagination a:hover,
-.pagination a:active {
+.pagination a:active,     /* This is pseudo-class. */
+.pagination a.active {    /* This is class. */
   background: #00695c;
   color: white;
 }

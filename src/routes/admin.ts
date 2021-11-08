@@ -27,4 +27,4 @@ adminRoutes.post(
     adminController.postEditProduct
 )
 
-adminRoutes.post('/delete-product/:productId', authenticate, adminController.postDeleteProduct)
+adminRoutes.delete('/delete-product/:productId', authenticate, adminController.postDeleteProduct)

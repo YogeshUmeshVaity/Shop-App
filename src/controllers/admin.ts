@@ -142,9 +142,9 @@ export const postDeleteProduct = async (
         const user = await findUser(request)
         //TODO: When a product is deleted, it needs to be deleted from the carts of all users, not just this user.
         await user.deleteCartItem(productId)
-        response.redirect('/admin/products')
+        response.status(200).json({ message: 'Success!' })
     } catch (error) {
-        next(error)
+        response.status(500).json({ message: 'Deleting the product failed.' })
     }
 }
 

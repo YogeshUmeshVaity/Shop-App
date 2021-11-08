@@ -11,7 +11,7 @@ import { DocumentType } from '@typegoose/typegoose'
 /**
  * Number of products to be displayed per page on home page, products page and admin products page.
  */
-export const ITEMS_PER_PAGE = 2
+export const ITEMS_PER_PAGE = 12
 
 /**
  * Represents pagination data to be sent to the views for the product list.

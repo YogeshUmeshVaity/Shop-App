@@ -16,6 +16,8 @@ shopRoutes.post('/cart', authenticate, shopController.postCart)
 
 shopRoutes.post('/delete-cart-item', authenticate, shopController.deleteCartItem)
 
+shopRoutes.get('/checkout', authenticate, shopController.getCheckout)
+
 shopRoutes.post('/create-order', authenticate, shopController.postOrder)
 
 shopRoutes.get('/orders', authenticate, shopController.getOrders)

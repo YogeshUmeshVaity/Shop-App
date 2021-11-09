@@ -8,6 +8,11 @@ import { FileReadException } from '../exceptions/ReadFileException'
 import PDFDocument from 'pdfkit'
 import { DocumentType } from '@typegoose/typegoose'
 
+interface CartItemWithProduct {
+    productId: DocumentType<Product>
+    quantity: number
+}
+
 /**
  * Number of products to be displayed per page on home page, products page and admin products page.
  */
@@ -96,7 +101,6 @@ export const getCart = async (
         const userWithCartProducts = await request.user
             .populate('cart.items.productId')
             .execPopulate()
-        console.log('User with Cart Products', userWithCartProducts.cart)
         response.render('shop/cart', {
             pageTitle: 'Your Cart',
             routePath: '/cart',
@@ -172,11 +176,34 @@ export const getOrders = async (
     }
 }
 
-export const getCheckout = (request: Request, response: Response): void => {
-    response.render('shop/checkout', {
-        pageTitle: 'Checkout',
-        routePath: '/checkout'
-    })
+export const getCheckout = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        // TODO: App crashes after you navigate to cart when a product is deleted while it's still in the cart.
+        // TODO: So, we should delete the product from cart when the it's deleted from the products collection.
+        const userWithCartProducts = await request.user
+            .populate('cart.items.productId')
+            .execPopulate()
+        const cartItems = userWithCartProducts.cart.items
+        let totalPrice = 0
+        cartItems.forEach((item: CartItemWithProduct) => {
+            // productId object is of type Product here and not a string.
+            totalPrice += item.productId.price * item.quantity
+        })
+        console.log('Total Price', totalPrice)
+        response.render('shop/checkout', {
+            pageTitle: 'Checkout',
+            routePath: '/checkout',
+            cartItems: cartItems,
+            totalPrice: totalPrice
+        })
+    } catch (error) {
+        next(new DatabaseException(`Unable to populate cart items for this user.`))
+    }
+    
 }
 
 export const getInvoice = async (

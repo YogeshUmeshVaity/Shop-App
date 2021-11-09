@@ -18,7 +18,11 @@ shopRoutes.post('/delete-cart-item', authenticate, shopController.deleteCartItem
 
 shopRoutes.get('/checkout', authenticate, shopController.getCheckout)
 
-shopRoutes.post('/create-order', authenticate, shopController.postOrder)
+shopRoutes.get('/checkout/success', authenticate, shopController.getCheckoutSuccess)
+
+shopRoutes.get('/checkout/cancel', authenticate, shopController.getCheckout)
+
+// shopRoutes.post('/create-order', authenticate, shopController.postOrder)
 
 shopRoutes.get('/orders', authenticate, shopController.getOrders)
 

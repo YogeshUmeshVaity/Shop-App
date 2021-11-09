@@ -16,5 +16,22 @@
                 <div class="centered">
                     <h2>Total Price: <%= totalPrice %></h2>
                 </div>
+                <div>
+                    <button id="order-btn" class="btn">ORDER</button>
+                    <script src="https://js.stripe.com/v3/"></script>
+                    <script>
+                        // Set your publishable key: remember to change this to your live publishable key in production
+                        // See your keys here: https://dashboard.stripe.com/apikeys
+                        // This Stripe() is available in the script we are importing from stripe.com above.
+                        const stripe = Stripe('pk_test_51Jtni3SHqtRzkwdP1akpPng3V3xRAuicstdAWh3iPygp23RX2N4uWKOxo0CpJCMl8vZesfWvKjhVZ6DABIwzRQoS00kaFrRIWT');
+                        const orderButton = document.getElementById('order-btn')
+                        orderButton.addEventListener('click', function() {
+                            stripe.redirectToCheckout({
+                                // We can inject ejs variables into Javascript code too.
+                                sessionId: '<%= sessionId %>'
+                            })
+                        })
+                    </script>
+                </div>
         </main>
         <%- include('../includes/end.ejs') %>

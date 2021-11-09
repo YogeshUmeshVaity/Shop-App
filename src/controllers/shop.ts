@@ -7,6 +7,9 @@ import path from 'path'
 import { FileReadException } from '../exceptions/ReadFileException'
 import PDFDocument from 'pdfkit'
 import { DocumentType } from '@typegoose/typegoose'
+import { stripe } from '../util/stripe'
+import { PaymentException } from '../exceptions/PaymentExceptions/PaymentException'
+import { ifError } from 'assert'
 
 interface CartItemWithProduct {
     productId: DocumentType<Product>
@@ -159,6 +162,19 @@ export const postOrder = async (
     }
 }
 
+export const getCheckoutSuccess = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        await OrderModel.addOrder(request.user)
+        response.redirect('/orders')
+    } catch (error) {
+        next(new DatabaseException(`Unable to add the order for this user.`))
+    }
+}
+
 export const getOrders = async (
     request: Request,
     response: Response,
@@ -176,6 +192,12 @@ export const getOrders = async (
     }
 }
 
+//TODO: Currently there is a flaw in the payment system. The users can visit manually the url
+// localhost:3000/checkout/success and place fraudulent orders. So not rely on the success_url.
+// Currently we need to manually check the Stripe dashboard, if the payment was successful and only
+// then grant the users the goods.
+// Use webhooks to know when the payment is really successful and grant the users the goods automatically.
+// https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=elements#web-post-payment
 export const getCheckout = async (
     request: Request,
     response: Response,
@@ -184,26 +206,25 @@ export const getCheckout = async (
     try {
         // TODO: App crashes after you navigate to cart when a product is deleted while it's still in the cart.
         // TODO: So, we should delete the product from cart when the it's deleted from the products collection.
-        const userWithCartProducts = await request.user
-            .populate('cart.items.productId')
-            .execPopulate()
+        const userWithCartProducts = await populateUserWithCartProducts(request)
         const cartItems = userWithCartProducts.cart.items
         let totalPrice = 0
         cartItems.forEach((item: CartItemWithProduct) => {
             // productId object is of type Product here and not a string.
             totalPrice += item.productId.price * item.quantity
         })
-        console.log('Total Price', totalPrice)
+
+        const session = await createStripePaymentSession(cartItems, request)
         response.render('shop/checkout', {
             pageTitle: 'Checkout',
             routePath: '/checkout',
             cartItems: cartItems,
-            totalPrice: totalPrice
+            totalPrice: totalPrice,
+            sessionId: session.id
         })
     } catch (error) {
-        next(new DatabaseException(`Unable to populate cart items for this user.`))
+        next(ifError)
     }
-    
 }
 
 export const getInvoice = async (
@@ -220,6 +241,43 @@ export const getInvoice = async (
         createInvoicePDFAndSend(invoicePath, invoiceName, response, order)
     } catch (error) {
         next(error)
+    }
+}
+
+async function populateUserWithCartProducts(request: Request) {
+    try {
+        return await request.user.populate('cart.items.productId').execPopulate()
+    } catch (err) {
+        throw new DatabaseException(`Unable to populate cart items for this user.`)
+    }
+}
+
+//TODO: Currently there is a flaw in the payment system. The users can visit manually the url
+// localhost:3000/checkout/success and place fraudulent orders. So not rely on the success_url.
+// Currently we need to manually check the Stripe dashboard, if the payment was successful and only
+// then grant the users the goods.
+// Use webhooks to know when the payment is really successful and grant the users the goods automatically.
+// https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=elements#web-post-payment
+async function createStripePaymentSession(cartItems: CartItemWithProduct[], request: Request) {
+    // eslint-disable-next-line no-useless-catch
+    try {
+        return await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: cartItems.map((item: CartItemWithProduct) => {
+                return {
+                    name: item.productId.title,
+                    description: item.productId.description,
+                    amount: item.productId.price * 100,
+                    currency: 'inr',
+                    quantity: item.quantity
+                }
+            }),
+            success_url: request.protocol + '://' + request.get('host') + '/checkout/success',
+            cancel_url: request.protocol + '://' + request.get('host') + '/checkout/cancel'
+        })
+    } catch (error) {
+        console.log(error)
+        throw new PaymentException('Something went wrong with payment.')
     }
 }
 

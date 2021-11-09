@@ -17,6 +17,7 @@ export class Cart {
     @prop({ type: () => CartItem, required: true, _id: false }) // specifying type here is important
     items!: CartItem[]
 
+    //TODO: Remove this unused field. The totalPrice is calculated on the fly wherever required.
     @prop({ required: true })
     totalPrice!: number
 }

@@ -3,6 +3,7 @@ import { FileDeleteException } from '../exceptions/FileExceptions/FileDeleteExce
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 import { PaymentException } from '../exceptions/PaymentExceptions/PaymentException'
 import { FileReadException } from '../exceptions/ReadFileException'
+import { Logger } from '../lib/logger'
 
 export const get404 = (request: Request, response: Response): void => {
     response.status(404).render('404', {
@@ -25,8 +26,7 @@ export const logErrors = (
     response: Response,
     next: NextFunction
 ): void => {
-    // TODO: in production, don't use console.log() or console.err() because it is not async and is very slow. Use dedicated loggers.
-    console.log(error)
+    Logger.error(error)
     next(error)
 }
 

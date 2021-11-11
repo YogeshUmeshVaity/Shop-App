@@ -10,6 +10,7 @@ import { DocumentType } from '@typegoose/typegoose'
 import { stripe } from '../util/stripe'
 import { PaymentException } from '../exceptions/PaymentExceptions/PaymentException'
 import { ifError } from 'assert'
+import { Logger } from '../lib/logger'
 
 interface CartItemWithProduct {
     productId: DocumentType<Product>
@@ -140,7 +141,7 @@ export const deleteCartItem = async (
     next: NextFunction
 ): Promise<void> => {
     const productId: string = request.body.itemId
-    console.log('Product to delete ID', productId)
+    Logger.info('Product to delete ID', productId)
     try {
         await request.user.deleteCartItem(productId)
         response.redirect('/cart')
@@ -236,6 +237,7 @@ export const getInvoice = async (
     const userId = request.user._id
     try {
         const order = await findOrderToCheckAuthorization(orderId, userId)
+        Logger.info(`Authorization for invoice successful`)
         const invoiceName = 'invoice-' + orderId + '.pdf'
         const invoicePath = path.join(__dirname, '..', 'data', 'invoices', invoiceName)
         createInvoicePDFAndSend(invoicePath, invoiceName, response, order)
@@ -276,7 +278,7 @@ async function createStripePaymentSession(cartItems: CartItemWithProduct[], requ
             cancel_url: request.protocol + '://' + request.get('host') + '/checkout/cancel'
         })
     } catch (error) {
-        console.log(error)
+        Logger.error(error)
         throw new PaymentException('Something went wrong with payment.')
     }
 }
@@ -306,14 +308,18 @@ async function getProductCount(): Promise<number> {
     }
 }
 
+// Throws error if not authorized. TODO: better to throw AuthorizationException instead of DatabaseException.
 async function findOrderToCheckAuthorization(
     orderId: string,
     userId: string
 ): Promise<DocumentType<Order>> {
+    Logger.info(`orderId: ${orderId}`)
+    Logger.info(`userId: ${userId}`)
     try {
         // The check for 'user._id' makes sure only the authorized user has access to invoice.
         return await OrderModel.findOne({ _id: orderId, 'user._id': userId }).orFail().exec()
     } catch (error) {
+        Logger.error(error)
         throw new DatabaseException(
             'This user is not authorized to access the invoice of this order.'
         )

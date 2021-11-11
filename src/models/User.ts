@@ -1,4 +1,5 @@
 import { DocumentType, getModelForClass, prop } from '@typegoose/typegoose'
+import { Logger } from '../lib/logger'
 import { Cart } from './Cart'
 import { Product } from './Product'
 
@@ -32,16 +33,16 @@ export class User {
         const existingItemIndex = this.cart.items.findIndex(
             (item) => item.productId?.toString() === product._id.toString()
         )
-        console.log('Existing Item Index', existingItemIndex)
+        Logger.debug(`Existing Item Index: ${existingItemIndex}`)
         if (existingItemIndex >= 0) {
             updatedCartItems[existingItemIndex].quantity += newQuantity
         } else {
             updatedCartItems.push({ productId: product._id, quantity: newQuantity })
         }
         const updatedCart: Cart = { items: updatedCartItems, totalPrice: 0 }
-        console.log('Updated cart:', updatedCart)
+        Logger.debug(`Updated cart: ${updatedCart}`)
         this.cart = updatedCart
-        console.log('This user cart', this.cart)
+        Logger.debug(`This user's cart: ${this.cart}`)
         // this.save() doesn't work for some reason
         await getModelForClass(User).findByIdAndUpdate({ _id: this._id }, { cart: updatedCart })
     }

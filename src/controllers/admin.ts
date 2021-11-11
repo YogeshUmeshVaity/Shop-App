@@ -7,6 +7,7 @@ import { deleteFile } from '../util/fileSystem'
 import { FileDeleteException } from '../exceptions/FileExceptions/FileDeleteException'
 import path from 'path'
 import { ITEMS_PER_PAGE, preparePaginationData } from './shop'
+import { Logger } from '../lib/logger'
 
 export const initializeUser = async (
     request: Request,
@@ -46,6 +47,7 @@ export const postAddProduct = async (
     response: Response,
     next: NextFunction
 ): Promise<void> => {
+    Logger.http(`Product title: ${request.body.title}`)
     const productImage = request.file
     // Won't be thrown, taken care in validation already. This is just for non-null assertion.
     if (!productImage) throw Error('The product image file is undefined.')

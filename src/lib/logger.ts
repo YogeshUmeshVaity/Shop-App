@@ -40,8 +40,6 @@ winston.addColors(colors)
 const format = winston.format.combine(
     // Add the message timestamp with the preferred format
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-    // Tell Winston that the logs must be colored
-    winston.format.colorize({ all: true }),
     // Define the format of the message showing the timestamp, the level and the message
     winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`)
 )
@@ -50,15 +48,25 @@ const format = winston.format.combine(
 // In this example, we are using three different transports
 const transports = [
     // Allow the use the console to print the messages
-    new winston.transports.Console(),
-    // Allow to print all the error level messages inside the error.log file
-    new winston.transports.File({
-        filename: 'logs/error.log',
-        level: 'error'
+    // Tell Winston that the logs in console must be colored
+    new winston.transports.Console({
+        format: winston.format.combine(
+            winston.format.colorize({
+                all: true
+            })
+        )
     }),
+    // Allow to print all the error level messages inside the error.log file
+
+    // new winston.transports.File({
+    //     filename: 'logs/error.log',
+    //     level: 'error'
+    // }),
+
     // Allow to print all the error message inside the all.log file
     // (also the error log that are also printed inside the error.log(
-    new winston.transports.File({ filename: 'logs/all.log' })
+
+    // new winston.transports.File({ filename: 'logs/all.log' })
 ]
 
 // Create the logger instance that has to be exported

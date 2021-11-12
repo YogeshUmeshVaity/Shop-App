@@ -15,6 +15,7 @@ import { fileFilter, fileStorage } from './util/multer'
 import * as errorController from './controllers/error'
 import { addLocals, initializeUser } from './controllers/admin'
 import { initializeSession } from './controllers/authentication'
+import { morganMiddleware } from './middleware/morgan'
 
 
 const app = express()
@@ -28,6 +29,17 @@ app.set('view engine', 'ejs')
 
 // Set the name of the directory where views are stored.
 app.set('views', path.join(__dirname, 'views'))
+
+// Used for serving public static files. Express assumes that the files are served from the root
+// directory. That means the directory 'public' is not included in the path.
+// If you want the 'public' directory included, mention that initially like:
+// app.use('/public', express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'images')))
+
+// Log the http request with Morgan. This should be used before express.static otherwise the static
+// assets will also be logged. The static assets that don't exist are still logged.
+app.use(morganMiddleware)
 
 // Text, number, url or plaintext
 // Content-type: application/x-www-form-urlencoded.
@@ -51,13 +63,6 @@ app.use(initializeUser)
 
 // Adds frequently required data all at once to the view for every request.
 app.use(addLocals)
-
-// Used for serving public static files. Express assumes that the files are served from the root
-// directory. That means the directory 'public' is not included in the path.
-// If you want the 'public' directory included, mention that initially like:
-// app.use('/public', express.static(path.join(__dirname, 'public')))
-app.use(express.static(path.join(__dirname, 'public')))
-app.use(express.static(path.join(__dirname, 'images')))
 
 app.use('/admin', adminRoutes)
 app.use('/', shopRoutes)

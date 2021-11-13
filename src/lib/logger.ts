@@ -40,6 +40,8 @@ winston.addColors(colors)
 const format = winston.format.combine(
     // Add the message timestamp with the preferred format
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+    // Allows using string interpolation for printing objects. e.g. ('cart: %o', cartObject)
+    winston.format.splat(),
     // Define the format of the message showing the timestamp, the level and the message
     winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`)
 )

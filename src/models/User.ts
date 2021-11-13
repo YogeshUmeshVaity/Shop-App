@@ -40,9 +40,9 @@ export class User {
             updatedCartItems.push({ productId: product._id, quantity: newQuantity })
         }
         const updatedCart: Cart = { items: updatedCartItems, totalPrice: 0 }
-        Logger.debug(`Updated cart: ${updatedCart}`)
+        Logger.debug('Updated cart: %o', updatedCart)
         this.cart = updatedCart
-        Logger.debug(`This user's cart: ${this.cart}`)
+        Logger.debug("This user's cart: %o", this.cart)
         // this.save() doesn't work for some reason
         await getModelForClass(User).findByIdAndUpdate({ _id: this._id }, { cart: updatedCart })
     }

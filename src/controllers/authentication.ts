@@ -10,7 +10,7 @@ import crypto from 'crypto'
 import { promisify } from 'util'
 import { PasswordResetException } from '../exceptions/authExceptions/PasswordResetException'
 import { emailClient } from '../util/emailClient'
-import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
+import { DatabaseException } from '../exceptions/httpExceptions/DatabaseException'
 
 const randomBytesAsync = promisify(crypto.randomBytes)
 const ONE_HOUR = 3600000

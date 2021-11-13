@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
-import { FileDeleteException } from '../exceptions/FileExceptions/FileDeleteException'
-import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
-import { PaymentException } from '../exceptions/PaymentExceptions/PaymentException'
-import { FileReadException } from '../exceptions/FileExceptions/FileReadException'
+import { FileDeleteException } from '../exceptions/fileExceptions/FileDeleteException'
+import { DatabaseException } from '../exceptions/httpExceptions/DatabaseException'
+import { PaymentException } from '../exceptions/paymentExceptions/PaymentException'
+import { FileReadException } from '../exceptions/fileExceptions/FileReadException'
 import { Logger } from '../lib/logger'
 
 export const get404 = (request: Request, response: Response): void => {

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import session from 'express-session'
 import mongoDbSession from 'connect-mongodb-session'
-import { databaseUrl } from '../util/database'
+import { databaseUrl } from '../lib/database'
 import { User, UserModel } from '../models/User'
 import { DocumentType } from '@typegoose/typegoose'
 import bcrypt from 'bcryptjs'
@@ -9,7 +9,7 @@ import { BeAnObject } from '@typegoose/typegoose/lib/types'
 import crypto from 'crypto'
 import { promisify } from 'util'
 import { PasswordResetException } from '../exceptions/authExceptions/PasswordResetException'
-import { emailClient } from '../util/emailClient'
+import { emailClient } from '../lib/emailClient'
 import { DatabaseException } from '../exceptions/httpExceptions/DatabaseException'
 
 const randomBytesAsync = promisify(crypto.randomBytes)

@@ -27,6 +27,8 @@ export const logErrors = (
     next: NextFunction
 ): void => {
     Logger.error(error)
+    // sendMailToAdminIfCritical()
+    // sendEventsToLogMonitoringSystem()
     next(error)
 }
 
@@ -37,41 +39,46 @@ export const handleErrors = (
     next: NextFunction
 ): void => {
     if (error instanceof DatabaseException) {
-        // TODO: Error message could be passed here.
+        Logger.error(error.cause)
+        // TODO: error.message could be passed here.
         return response.status(error.status).render('500', {
             pageTitle: 'Something went wrong.',
             routePath: '/500',
             isAuthenticated: request.session.isLoggedIn
         })
     } else if (error instanceof FileReadException) {
-        // TODO: Error message could be passed here.
+        Logger.error(error.cause)
+        // TODO: error.message could be passed here.
         return response.status(500).render('500', {
             pageTitle: 'Something went wrong.',
             routePath: '/500',
             isAuthenticated: request.session.isLoggedIn
         })
     } else if (error instanceof FileDeleteException) {
-        // TODO: Error message could be passed here.
+        Logger.error(error.cause)
+        // TODO: error.message could be passed here.
         return response.status(500).render('500', {
             pageTitle: 'Something went wrong.',
             routePath: '/500',
             isAuthenticated: request.session.isLoggedIn
         })
     } else if (error instanceof PaymentException) {
-        // TODO: Error message could be passed here.
+        Logger.error(error.cause)
+        // TODO: error.message could be passed here.
         return response.status(500).render('500', {
             pageTitle: 'Something went wrong.',
             routePath: '/500',
             isAuthenticated: request.session.isLoggedIn
         })
     } else if (error instanceof Error) {
-        // TODO: Error message could be passed here.
+        // TODO: error.message could be passed here.
         return response.status(500).render('500', {
             pageTitle: 'Something went wrong.',
             routePath: '/500',
             isAuthenticated: request.session.isLoggedIn
         })
     }
+    // If any other or error of type 'unknown'
     return response.render('500', {
         pageTitle: 'Something went wrong.',
         routePath: '/500',

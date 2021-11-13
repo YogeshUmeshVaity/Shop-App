@@ -11,6 +11,6 @@ export const deleteFile = async (filePath: string): Promise<void> => {
         // be displayed in the console for debug purposes.
         // There may also be separate message for logging and displaying to the client.
         console.log(error)
-        throw new FileDeleteException(`Error while deleting the file at ${filePath}.`)
+        throw new FileDeleteException(`Error while deleting the file at ${filePath}.`, error)
     }
 }

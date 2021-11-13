@@ -1,5 +1,5 @@
 export class PasswordResetException extends Error {
-    constructor(message: string) {
+    constructor(message: string, public cause: unknown) {
         super(message)
     }
 }

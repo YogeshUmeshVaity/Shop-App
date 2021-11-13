@@ -69,7 +69,7 @@ export const getProductDetails = async (
             routePath: '/products'
         })
     } catch (error) {
-        next(new DatabaseException(`Product with ID ${productId} cannot be found.`))
+        next(new DatabaseException(`Product with ID ${productId} cannot be found.`, error))
     }
 }
 
@@ -111,7 +111,7 @@ export const getCart = async (
             cartItems: userWithCartProducts.cart.items
         })
     } catch (error) {
-        next(new DatabaseException(`Unable to populate cart items for this user.`))
+        next(new DatabaseException(`Unable to populate cart items for this user.`, error))
     }
 }
 
@@ -129,8 +129,11 @@ export const postCart = async (
         response.redirect('/cart')
     } catch (error) {
         next(
-            new DatabaseException(`Either the product with that ID was not found or cannot add
-                                    the product to the cart.`)
+            new DatabaseException(
+                `Either the product with that ID was not found or cannot add
+                                    the product to the cart.`,
+                error
+            )
         )
     }
 }
@@ -146,7 +149,7 @@ export const deleteCartItem = async (
         await request.user.deleteCartItem(productId)
         response.redirect('/cart')
     } catch (error) {
-        next(new DatabaseException(`Something went wrong while deleting the cart item.`))
+        next(new DatabaseException(`Something went wrong while deleting the cart item.`, error))
     }
 }
 
@@ -159,7 +162,7 @@ export const postOrder = async (
         await OrderModel.addOrder(request.user)
         response.redirect('/orders')
     } catch (error) {
-        next(new DatabaseException(`Unable to add the order for this user.`))
+        next(new DatabaseException(`Unable to add the order for this user.`, error))
     }
 }
 
@@ -172,7 +175,7 @@ export const getCheckoutSuccess = async (
         await OrderModel.addOrder(request.user)
         response.redirect('/orders')
     } catch (error) {
-        next(new DatabaseException(`Unable to add the order for this user.`))
+        next(new DatabaseException(`Unable to add the order for this user.`, error))
     }
 }
 
@@ -189,7 +192,7 @@ export const getOrders = async (
             orders: orders
         })
     } catch (error) {
-        next(new DatabaseException(`Cannot find the order for this user ID.`))
+        next(new DatabaseException(`Cannot find the order for this user ID.`, error))
     }
 }
 
@@ -249,8 +252,8 @@ export const getInvoice = async (
 async function populateUserWithCartProducts(request: Request) {
     try {
         return await request.user.populate('cart.items.productId').execPopulate()
-    } catch (err) {
-        throw new DatabaseException(`Unable to populate cart items for this user.`)
+    } catch (error) {
+        throw new DatabaseException(`Unable to populate cart items for this user.`, error)
     }
 }
 
@@ -279,7 +282,7 @@ async function createStripePaymentSession(cartItems: CartItemWithProduct[], requ
         })
     } catch (error) {
         Logger.error(error)
-        throw new PaymentException('Something went wrong with payment.')
+        throw new PaymentException('Something went wrong with payment.', error)
     }
 }
 
@@ -295,16 +298,16 @@ async function getProductsToDisplay(page: number): Promise<DocumentType<Product>
             .skip((page - 1) * ITEMS_PER_PAGE)
             .limit(ITEMS_PER_PAGE)
             .exec()
-    } catch (err) {
-        throw new DatabaseException('Unable to fetch the product list.')
+    } catch (error) {
+        throw new DatabaseException('Unable to fetch the product list.', error)
     }
 }
 
 async function getProductCount(): Promise<number> {
     try {
         return await ProductModel.find().countDocuments().exec()
-    } catch (err) {
-        throw new DatabaseException('Unable to get the product count.')
+    } catch (error) {
+        throw new DatabaseException('Unable to get the product count.', error)
     }
 }
 
@@ -321,7 +324,8 @@ async function findOrderToCheckAuthorization(
     } catch (error) {
         Logger.error(error)
         throw new DatabaseException(
-            'This user is not authorized to access the invoice of this order.'
+            'This user is not authorized to access the invoice of this order.',
+            error
         )
     }
 }
@@ -351,8 +355,8 @@ function createInvoicePDFAndSend(
 // Streams can emit an error event. You can listen for this event to prevent the default
 // behavior of throwing the error.
 function setErrorHandlerFor(invoicePDF: PDFKit.PDFDocument) {
-    invoicePDF.on('error', function () {
-        throw new FileReadException('Error reading the invoice file.')
+    invoicePDF.on('error', function (error: unknown) {
+        throw new FileReadException('Error reading the invoice file.', error)
     })
 }
 

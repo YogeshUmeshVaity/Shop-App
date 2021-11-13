@@ -43,7 +43,7 @@ export const initializeSession = async (
         })(request, response, next)
         // Do not call next() here. It causes error.
     } catch (error) {
-        next(new DatabaseException(`Unable to create the express-session.`))
+        next(new DatabaseException(`Unable to create the express-session.`, error))
     }
 }
 
@@ -102,7 +102,8 @@ export const postLogin = async (
     } catch (error) {
         next(
             new DatabaseException(
-                `Problem retrieving the user from the database or matching the passwords`
+                `Problem retrieving the user from the database or matching the passwords.`,
+                error
             )
         )
     }
@@ -147,7 +148,12 @@ export const postSignup = async (
         await sendWelcomeEmail(email)
         response.redirect('/login')
     } catch (error) {
-        next(new DatabaseException(`Problem while hashing password or saving the user to database`))
+        next(
+            new DatabaseException(
+                `Problem while hashing password or saving the user to database`,
+                error
+            )
+        )
     }
 }
 
@@ -191,7 +197,7 @@ export const postResetPassword = async (
         if (error instanceof PasswordResetException) {
             return response.redirect('/reset-password')
         } else {
-            next(new DatabaseException(`Something went wrong while resetting the password.`))
+            next(new DatabaseException(`Something went wrong while resetting the password.`, error))
         }
     }
 }
@@ -219,7 +225,10 @@ export const getNewPassword = async (
         })
     } catch (error) {
         next(
-            new DatabaseException(`Unable to verify the authenticity of the password reset token.`)
+            new DatabaseException(
+                `Unable to verify the authenticity of the password reset token.`,
+                error
+            )
         )
     }
 }
@@ -238,7 +247,10 @@ export const postNewPassword = async (
         response.redirect('/login')
     } catch (error) {
         next(
-            new DatabaseException(`Unable to verify the authenticity of the password reset token.`)
+            new DatabaseException(
+                `Unable to verify the authenticity of the password reset token.`,
+                error
+            )
         )
     }
 }
@@ -296,7 +308,7 @@ async function createResetToken(): Promise<string> {
     } catch (error) {
         console.log(error)
         // TODO: Not sure if it's a good idea not passing the original error object.
-        throw new PasswordResetException('Error creating the password reset token.')
+        throw new PasswordResetException('Error creating the password reset token.', error)
     }
     return buffer.toString('hex')
 }

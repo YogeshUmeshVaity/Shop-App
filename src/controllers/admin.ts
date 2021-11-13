@@ -21,7 +21,7 @@ export const initializeUser = async (
         request.user = await UserModel.findById(request.session.user._id).orFail().exec()
         next()
     } catch (error) {
-        next(new DatabaseException(`Error initializing the user.`))
+        next(new DatabaseException(`Error initializing the user.`, error))
     }
 }
 
@@ -62,7 +62,7 @@ export const postAddProduct = async (
         await newProduct.save()
         response.redirect('/')
     } catch (error) {
-        next(new DatabaseException('Problem saving the new product to the database.'))
+        next(new DatabaseException('Problem saving the new product to the database.', error))
     }
 }
 
@@ -86,7 +86,8 @@ export const getEditProduct = async (
     } catch (error) {
         next(
             new DatabaseException(
-                `Editing of product failed. The product with ID ${productId} cannot not be found.`
+                `Editing of product failed. The product with ID ${productId} cannot not be found.`,
+                error
             )
         )
     }
@@ -153,8 +154,8 @@ export const postDeleteProduct = async (
 async function findUser(request: Request): Promise<DocumentType<User>> {
     try {
         return await UserModel.findById(request.session.user._id).orFail().exec()
-    } catch (err) {
-        throw new DatabaseException('Unable to the find the user.')
+    } catch (error) {
+        throw new DatabaseException('Unable to the find the user.', error)
     }
 }
 
@@ -164,8 +165,8 @@ async function deleteProduct(request: Request) {
             _id: request.params.productId,
             createdByUserId: request.user._id
         })
-    } catch (err) {
-        throw new DatabaseException(`Unable to the delete the product.`)
+    } catch (error) {
+        throw new DatabaseException(`Unable to the delete the product.`, error)
     }
 }
 
@@ -188,7 +189,8 @@ async function updateProduct(
             throw error
         } else {
             throw new DatabaseException(
-                `Something went wrong while saving the product to the database.`
+                `Something went wrong while saving the product to the database.`,
+                error
             )
         }
     }
@@ -214,7 +216,8 @@ async function findProductToUpdate(productId: string, userId: string) {
     } catch (error) {
         throw new DatabaseException(
             `Editing of product failed. The product with ID ${productId} created by 
-                 userId ${userId} cannot not be found.`
+                 userId ${userId} cannot not be found.`,
+            error
         )
     }
 }
@@ -229,7 +232,8 @@ async function deleteProductImage(request: Request) {
         productToDelete = await ProductModel.findById(request.params.productId).orFail().exec()
     } catch (error) {
         throw new DatabaseException(
-            `Couldn't delete the product image because the product was not found.`
+            `Couldn't delete the product image because the product was not found.`,
+            error
         )
     }
     deleteOldImage(productToDelete)
@@ -244,8 +248,11 @@ function getPageNumber(request: Request): number {
 async function getProductCount(userId: string): Promise<number> {
     try {
         return await ProductModel.find({ createdByUserId: userId }).countDocuments().exec()
-    } catch (err) {
-        throw new DatabaseException(`Unable to retrieve the product count for user ID ${userId}`)
+    } catch (error) {
+        throw new DatabaseException(
+            `Unable to retrieve the product count for user ID ${userId}`,
+            error
+        )
     }
 }
 
@@ -258,7 +265,10 @@ async function getProductsToDisplay(
             .skip((page - 1) * ITEMS_PER_PAGE)
             .limit(ITEMS_PER_PAGE)
             .exec()
-    } catch (err) {
-        throw new DatabaseException(`Unable to retrieve the products created by user ID ${userId}`)
+    } catch (error) {
+        throw new DatabaseException(
+            `Unable to retrieve the products created by user ID ${userId}`,
+            error
+        )
     }
 }

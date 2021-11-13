@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs'
 import { BeAnObject } from '@typegoose/typegoose/lib/types'
 import crypto from 'crypto'
 import { promisify } from 'util'
-import { PasswordResetException } from '../exceptions/authExceptions/PasswordResetError'
+import { PasswordResetException } from '../exceptions/authExceptions/PasswordResetException'
 import { emailClient } from '../util/emailClient'
 import { DatabaseException } from '../exceptions/HttpExceptions/DatabaseException'
 

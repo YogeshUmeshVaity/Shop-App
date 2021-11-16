@@ -29,6 +29,7 @@ export class User {
         product: DocumentType<Product>,
         newQuantity: number
     ): Promise<void> {
+        // TODO: Check if we need to clone the cart instead of directly copying the reference.
         const updatedCartItems = this.cart.items
         const existingItemIndex = this.cart.items.findIndex(
             (item) => item.productId?.toString() === product._id.toString()

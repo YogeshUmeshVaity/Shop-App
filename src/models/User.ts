@@ -24,12 +24,13 @@ export class User {
     cart!: Cart
 
     // Instance method docs: https://typegoose.github.io/typegoose/docs/guides/quick-start-guide/#instance-methods
+    // TODO: We need to clone the cart instead of directly copying the reference. Check the best
+    // practice here: https://github.com/ryanmcdermott/clean-code-javascript#avoid-side-effects-part-2
     public async addToCart(
         this: DocumentType<User>,
         product: DocumentType<Product>,
         newQuantity: number
     ): Promise<void> {
-        // TODO: Check if we need to clone the cart instead of directly copying the reference.
         const updatedCartItems = this.cart.items
         const existingItemIndex = this.cart.items.findIndex(
             (item) => item.productId?.toString() === product._id.toString()

@@ -19,7 +19,6 @@ import { initializeSession } from './controllers/authentication'
 import { morganMiddleware } from './middleware/morgan'
 import helmetCSP from './lib/helmetCSP'
 
-
 const app = express()
 const csrfProtection = csrf()
 

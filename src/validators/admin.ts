@@ -1,4 +1,4 @@
-import { NextFunction, Request, request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { body, validationResult } from 'express-validator'
 
 const MIN_CHARS = 8

@@ -10,12 +10,14 @@ import csrf from 'csurf'
 import flash from 'connect-flash'
 import multer from 'multer'
 import { fileFilter, fileStorage } from './lib/multer'
+import helmet from 'helmet'
 
 // Controllers
 import * as errorController from './controllers/error'
 import { addLocals, initializeUser } from './controllers/admin'
 import { initializeSession } from './controllers/authentication'
 import { morganMiddleware } from './middleware/morgan'
+import helmetCSP from './lib/helmetCSP'
 
 
 const app = express()
@@ -30,6 +32,13 @@ app.set('view engine', 'ejs')
 // Set the name of the directory where views are stored.
 app.set('views', path.join(__dirname, 'views'))
 
+// Helmet helps in securing the apps by setting various HTTP headers. function is a wrapper around
+// 15 smaller middleware functions, 11 of which are enabled by default.
+app.use(helmet())
+
+// Customized helmet middleware for Content-Security-Policy header.
+app.use(helmetCSP)
+
 // Used for serving public static files. Express assumes that the files are served from the root
 // directory. That means the directory 'public' is not included in the path.
 // If you want the 'public' directory included, mention that initially like:
@@ -37,7 +46,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'images')))
 
-// Log the http request with Morgan. This should be used before express.static otherwise the static
+// Log the http request with Morgan. This should be used after express.static otherwise the static
 // assets will also be logged. The static assets that don't exist are still logged.
 app.use(morganMiddleware)
 

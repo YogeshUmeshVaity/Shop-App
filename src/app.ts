@@ -86,7 +86,7 @@ app.use(errorController.get404)
 
 /**
  * Since Express runs all the middleware from the first to the last, your error handlers should be
- * at the end of your application stack. If you pass the error to the next function, the framework
+ * at the end of your middleware stack. If you pass the error to the next function, the framework
  * omits all the other middleware in the chain and skips straight to the error handling middleware
  * which is recognized by the fact that it has four arguments.
  */

@@ -84,7 +84,6 @@ app.use(errorController.handleErrors)
 mongoose
     .connect(databaseUrl(), connectOptions)
     .then(() => {
-        // createTestUser()
         app.listen(process.env.PORT || 3000)
     })
     .catch((error) => console.log(error))

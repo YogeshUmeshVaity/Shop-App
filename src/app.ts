@@ -11,6 +11,8 @@ import flash from 'connect-flash'
 import multer from 'multer'
 import { fileFilter, fileStorage } from './lib/multer'
 import helmet from 'helmet'
+import compression from 'compression'
+import https from 'https'
 
 // Controllers
 import * as errorController from './controllers/error'
@@ -35,8 +37,12 @@ app.set('views', path.join(__dirname, 'views'))
 // 15 smaller middleware functions, 11 of which are enabled by default.
 app.use(helmet())
 
-// Customized helmet middleware for Content-Security-Policy header.
+// A Customized helmet middleware for Content-Security-Policy header.
 app.use(helmetCSP)
+
+// Compresses the response body and asset sizes upto 70%. So users have to download less data.
+// Disable this, if your hosting provider provides compression from their end.
+app.use(compression())
 
 // Used for serving public static files. Express assumes that the files are served from the root
 // directory. That means the directory 'public' is not included in the path.
@@ -89,9 +95,13 @@ app.use(errorController.get404)
 app.use(errorController.logErrors)
 app.use(errorController.handleErrors)
 
+// Generally hosting provider configures the SSL/TLS encryption. When we need to manually configure
+// the SSL, uncomment the https line and remove the 'app' from app.listen.
+// Also don't forget import sslPrivateKey and sslCertificate from util/ssl.ts
 mongoose
     .connect(databaseUrl(), connectOptions)
     .then(() => {
+        // https.createServer({ key: sslPrivateKey, cert: sslCertificate }, app)
         app.listen(process.env.PORT || 3000)
     })
     .catch((error) => console.log(error))

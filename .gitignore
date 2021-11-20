@@ -17,6 +17,10 @@
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
+# Self signed certificate files for using https protocol with SSL/TLS
+server.cert
+server.key
+
 ### macOS ###
 # General
 .DS_Store
@@ -301,5 +305,6 @@ src/images
 
 # PDF invoices for order created
 src/data/invoices
+
 
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,windows,linux,webstorm,visualstudiocode

@@ -1,7 +1,7 @@
 import helmet from 'helmet'
 
 /**
- * This middleware is defined separate from other default helmet middlwares for the stripe to
+ * This middleware is defined separate from other default helmet middlewares for the stripe to
  * correctly function. Without this the checkout page for stripe does not launch when the ORDER
  * button is clicked. Make sure to set useDefaults to true to inherit other defaults from helmet.
  */

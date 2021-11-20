@@ -40,6 +40,7 @@ app.use(helmetCSP)
 
 // Compresses the response body and asset sizes upto 70%. So users have to download less data.
 // Disable this, if your hosting provider provides compression from their end.
+// Heroku doesn't provide the compression, so we use it here.
 app.use(compression())
 
 // Used for serving public static files. Express assumes that the files are served from the root

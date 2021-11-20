@@ -20,12 +20,14 @@ export function sessionSecret(): string {
     return sessionSecret
 }
 
-// Generally hosting provider configures the SSL/TLS encryption. When we need to manually configure
-// the SSL, uncomment the https line and remove the 'app' from app.listen.
+// Generally hosting provider configures the SSL/TLS encryption. But When we need to manually configure
+// the SSL, uncomment the https line and comment out the app.listen line.
 // Also don't forget import sslPrivateKey and sslCertificate from util/ssl.ts
+// For Heroku we don't need to do it in our code. We setup https through Heroku's managed server.
 export async function connectToDatabase(app: Express): Promise<void> {
     try {
         await mongoose.connect(databaseUrl(), connectOptions)
+        // https.createServer({ key: sslPrivateKey, cert: sslCertificate }, app).listen(process.env.PORT || 3000)
         app.listen(process.env.PORT || 3000)
     } catch (error) {
         console.log(error)
